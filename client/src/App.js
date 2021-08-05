@@ -1,9 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+
+async function testApiRoute() {
+  const response = await fetch("/test");
+  console.log(response);
+}
 
 function App() {
   return (
     <div className="App">
+      <button onClick={testApiRoute}>TEST API ROUTE</button>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
