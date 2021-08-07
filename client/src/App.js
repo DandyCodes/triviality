@@ -1,15 +1,19 @@
 import logo from "./logo.svg";
 import "./App.css";
+import { messageAll } from "./controllers/io-client";
 
 async function testApiRoute() {
   const response = await fetch("/test");
   console.log(response);
 }
 
+const msg = "hi";
+
 function App() {
   return (
     <div className="App">
       <button onClick={testApiRoute}>TEST API ROUTE</button>
+      <button onClick={() => messageAll(msg)}>messageAll</button>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 router.get("/test", (req, res) => {
-  res.status(201);
+  res.status(204);
   res.send("hello");
 });
 
