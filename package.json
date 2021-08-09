@@ -1,5 +1,5 @@
 {
-  "name": "tech-friends",
+  "name": "triviality",
   "version": "1.0.0",
   "description": "",
   "main": "server/server.js",
@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "devDependencies": {
     "concurrently": "^5.1.0"
   }
