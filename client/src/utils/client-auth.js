@@ -1,37 +1,37 @@
 import decode from "jwt-decode";
 
-class ClientAuth {
+const clientAuth = {
   getDecodedToken() {
     return decode(this.getToken());
-  }
+  },
 
   isLoggedIn() {
     const token = this.getToken();
-    return token && !this.isTokenExpired(token);
-  }
+    return !!token && !this.isTokenExpired(token);
+  },
 
   isTokenExpired(token) {
-    try {
-      const decodedToken = decode(token);
-      return decodedToken.exp < Date.now() * 0.001;
-    } catch (err) {
+    const decoded = decode(token);
+    if (decoded.exp < Date.now() * 0.001) {
+      localStorage.removeItem("id_token");
       return true;
     }
-  }
+    return false;
+  },
 
   getToken() {
     return localStorage.getItem("id_token");
-  }
+  },
 
   onLogin(idToken) {
     localStorage.setItem("id_token", idToken);
     window.location.assign("/");
-  }
+  },
 
   onLogout() {
     localStorage.removeItem("id_token");
-    window.location.assign("/");
-  }
-}
+    window.location.reload();
+  },
+};
 
-export default new ClientAuth();
+export default clientAuth;

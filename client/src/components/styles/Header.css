@@ -1,0 +1,12 @@
+header {
+  background-color: var(--dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1,
+header h2 {
+  text-decoration: none;
+  color: var(--light);
+}
