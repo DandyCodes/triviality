@@ -17,12 +17,14 @@ const typeDefs = gql`
     users: [User]!
     user(userId: ID!): User
     me: User
+    confirmRoom(roomId: String): Boolean
   }
 
   type Mutation {
     addUser(name: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
     deleteUser: User
+    createRoom: String
   }
 `;
 

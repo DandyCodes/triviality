@@ -26,3 +26,9 @@ export const GET_ME = gql`
     }
   }
 `;
+
+export const CONFIRM_ROOM = gql`
+  query confirmRoom($roomId: String!) {
+    confirmRoom(roomId: $roomId)
+  }
+`;

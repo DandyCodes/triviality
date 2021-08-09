@@ -8,10 +8,11 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Users from "./pages/Users";
-import User from "./pages/User";
-import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import User from "./pages/User";
+import Users from "./pages/Users";
+import Room from "./pages/Room";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "./controllers/io-client";
@@ -59,6 +60,9 @@ function App() {
             </Route>
             <Route exact path="/users/:userId">
               <User />
+            </Route>
+            <Route exact path="/room/:roomId">
+              <Room />
             </Route>
           </div>
           <Footer />
