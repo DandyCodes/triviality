@@ -1,12 +1,10 @@
 const jwt = require("jsonwebtoken");
+const secret = process.env.SECRET || "345we6srdxf84675ri=790--08p;oui";
+const maxAge = "2h";
 
-const secret = process.env.SECRET || "345wesrfg890puoi9-=0y[56w8isr4tuxjfgn";
-const expiration = "2h";
-
-module.exports = {
+const serverAuth = {
   authMiddleware: function ({ req }) {
-    const token =
-      req.body.token || req.query.token || req.headers.authorization;
+    let token = req.body.token || req.query.token || req.headers.authorization;
     if (req.headers.authorization) {
       token = token.split(" ").pop().trim();
     }
@@ -14,16 +12,18 @@ module.exports = {
       return req;
     }
     try {
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      const { data } = jwt.verify(token, secret, { maxAge });
       req.user = data;
-    } catch (err) {
-      console.log("Invalid token", err);
+    } catch {
+      console.log("Invalid token");
     }
     return req;
   },
-  signToken: function ({ firstName, email, _id }) {
-    return jwt.sign({ data: { firstName, email, _id } }, secret, {
-      expiresIn: expiration,
-    });
+
+  signToken: function ({ email, name, _id }) {
+    const payload = { email, name, _id };
+    return jwt.sign({ data: payload }, secret, { expiresIn: maxAge });
   },
 };
+
+module.exports = serverAuth;
