@@ -2,65 +2,107 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { messageAll } from "./controllers/io-client";
 import clientAuth from "./utils/client-auth";
-import { ADD_USER } from "./utils/mutations";
+import { ADD_USER, LOGIN_USER } from "./utils/mutations";
 
 const msg = "hi";
 
 function App() {
-  const [formState, setFormState] = useState({
+  const [addUserFormState, setAddUserFormState] = useState({
     username: "",
     email: "",
     password: "",
   });
   const [addUser] = useMutation(ADD_USER);
 
-  const handleChange = event => {
+  const handleAddUserFormChange = event => {
     const { name, value } = event.target;
-    setFormState({
-      ...formState,
+    setAddUserFormState({
+      ...addUserFormState,
       [name]: value,
     });
   };
 
-  const handleFormSubmit = async event => {
+  const handleAddUserSubmit = async event => {
     event.preventDefault();
     const mutationResponse = await addUser({
       variables: {
-        username: formState.username,
-        email: formState.email,
-        password: formState.password,
+        username: addUserFormState.username,
+        email: addUserFormState.email,
+        password: addUserFormState.password,
       },
     });
     const token = mutationResponse.data.addUser.token;
     clientAuth.onLogin(token);
   };
 
+  const [loginFormState, setLoginFormState] = useState({
+    email: "",
+    password: "",
+  });
+  const [login] = useMutation(LOGIN_USER);
+
+  const handleLoginFormChange = event => {
+    const { name, value } = event.target;
+    setLoginFormState({
+      ...loginFormState,
+      [name]: value,
+    });
+  };
+
+  const handleLoginSubmit = async event => {
+    event.preventDefault();
+    const mutationResponse = await login({
+      variables: {
+        email: loginFormState.email,
+        password: loginFormState.password,
+      },
+    });
+    const token = mutationResponse.data.login.token;
+    clientAuth.onLogin(token);
+  };
+
   return (
     <div className="App">
       <button onClick={() => messageAll(msg)}>messageAll</button>
-      <form onSubmit={handleFormSubmit}>
+      <h1>ADD USER</h1>
+      <form onSubmit={handleAddUserSubmit}>
         <label htmlFor="username">Username</label>
         <input
           type="text"
-          id="username"
           name="username"
-          onChange={handleChange}
+          onChange={handleAddUserFormChange}
         ></input>
         <br></br>
         <label htmlFor="email">Email</label>
         <input
           type="text"
-          id="email"
           name="email"
-          onChange={handleChange}
+          onChange={handleAddUserFormChange}
         ></input>
         <br></br>
         <label htmlFor="password">Password</label>
         <input
           type="password"
-          id="password"
           name="password"
-          onChange={handleChange}
+          onChange={handleAddUserFormChange}
+        ></input>
+        <br></br>
+        <button>Submit</button>
+      </form>
+      <h1>LOGIN</h1>
+      <form onSubmit={handleLoginSubmit}>
+        <label htmlFor="email">Email</label>
+        <input
+          type="text"
+          name="email"
+          onChange={handleLoginFormChange}
+        ></input>
+        <br></br>
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          onChange={handleLoginFormChange}
         ></input>
         <br></br>
         <button>Submit</button>
