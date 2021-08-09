@@ -4,10 +4,44 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./controllers/io-client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink,
+} from "@apollo/client";
+import { ApolloLink } from "@apollo/client";
+
+const httpLinkToGraphQLServer = createHttpLink({
+  uri: "/graphql",
+});
+
+const authLink = new ApolloLink((operation, forward) => {
+  const token = localStorage.getItem("id_token");
+  const oldContext = operation.getContext();
+  const oldHeaders = oldContext?.headers || {};
+  const newContext = {
+    headers: {
+      ...oldHeaders,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+  operation.setContext(newContext);
+  return forward(operation);
+});
+
+const apolloClientLinks = authLink.concat(httpLinkToGraphQLServer);
+
+const client = new ApolloClient({
+  link: apolloClientLinks,
+  cache: new InMemoryCache(),
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
