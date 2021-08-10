@@ -23,9 +23,3 @@ export const LOGIN = gql`
     }
   }
 `;
-
-export const CREATE_ROOM = gql`
-  mutation createRoom {
-    createRoom
-  }
-`;

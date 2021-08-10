@@ -27,8 +27,14 @@ export const GET_ME = gql`
   }
 `;
 
-export const CONFIRM_ROOM = gql`
-  query confirmRoom($roomId: String!) {
-    confirmRoom(roomId: $roomId)
+export const GET_ROOM_MEMBERS = gql`
+  query getRoomMembers($roomId: String!) {
+    getRoomMembers(roomId: $roomId)
+  }
+`;
+
+export const ASK_FOR_UNIQUE_ROOM_ID = gql`
+  query askForUniqueRoomId {
+    askForUniqueRoomId
   }
 `;

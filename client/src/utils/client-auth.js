@@ -2,7 +2,9 @@ import decode from "jwt-decode";
 
 const clientAuth = {
   getDecodedToken() {
-    return decode(this.getToken());
+    const token = this.getToken();
+
+    return token ? decode(token) : null;
   },
 
   isLoggedIn() {
@@ -14,6 +16,7 @@ const clientAuth = {
     const decoded = decode(token);
     if (decoded.exp < Date.now() * 0.001) {
       localStorage.removeItem("id_token");
+      window.location.assign("/");
       return true;
     }
     return false;
