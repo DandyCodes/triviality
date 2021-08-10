@@ -1,5 +1,6 @@
 const chalk = require("chalk");
 const { randomRangeInt } = require("../utils/helpers");
+const profanityFilter = require("../utils/profanity-filter");
 
 const ioServer = {
   io: null,
@@ -45,15 +46,18 @@ const ioServer = {
     // this.getSocketFromNickName();
     let roomId;
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let unique = false;
-    while (!unique) {
+    let uniqueAndNotProfane = false;
+    while (!uniqueAndNotProfane) {
       roomId = "";
       for (let i = 0; i < length; i++) {
         const randomIndex = randomRangeInt(0, characters.length);
         roomId += characters[randomIndex];
       }
-      if (!this.getRooms().includes(roomId)) {
-        unique = true;
+      if (
+        !this.getRooms().includes(roomId) &&
+        !profanityFilter.isProfane(roomId)
+      ) {
+        uniqueAndNotProfane = true;
       }
     }
     return roomId;
