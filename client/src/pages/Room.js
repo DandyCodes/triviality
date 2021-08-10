@@ -1,24 +1,20 @@
 import React from "react";
 import { Redirect, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 import clientAuth from "../utils/client-auth";
-import { CONFIRM_ROOM } from "../utils/queries";
+import ioClientController from "../controllers/io-client";
+import RoomMembers from "../components/RoomMembers";
 
-const Room = props => {
+const Room = () => {
   const { roomId } = useParams();
-  const { loading, data } = useQuery(CONFIRM_ROOM, {
-    variables: { roomId },
-  });
-  return !clientAuth.isLoggedIn ? (
-    <Redirect to="/login" />
-  ) : loading ? (
-    <div>Loading...</div>
-  ) : data && data.confirmRoom ? (
+  if (!clientAuth.isLoggedIn()) {
+    return <Redirect to="/" />;
+  }
+  ioClientController.joinIoRoom(roomId);
+  return (
     <main>
       <h1>Room ID: {roomId}</h1>
+      <RoomMembers roomId={roomId}></RoomMembers>
     </main>
-  ) : (
-    <Redirect to="/" />
   );
 };
 

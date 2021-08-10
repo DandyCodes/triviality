@@ -1,8 +1,7 @@
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/server-auth");
 const { User } = require("../models");
-
-const rooms = [];
+const ioServerController = require("../controllers/io-server-controller");
 
 const resolvers = {
   Query: {
@@ -21,12 +20,18 @@ const resolvers = {
       return User.findOne({ _id: context.user._id });
     },
 
-    confirmRoom: async (_, { roomId }, context) => {
+    getRoomMembers: async (_, { roomId }, context) => {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      const room = rooms.find(room => room.id === roomId);
-      return room.userIds.includes(context.user._id);
+      return ioServerController.getUsersInRoom(roomId);
+    },
+
+    askForUniqueRoomId: async (_, __, context) => {
+      if (!context.user) {
+        throw new AuthenticationError("Must be logged in");
+      }
+      return ioServerController.generateUniqueRoomId(4);
     },
   },
 
@@ -56,46 +61,7 @@ const resolvers = {
       }
       return User.findOneAndDelete({ _id: context.user._id });
     },
-
-    createRoom: async (_, __, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      const roomId = generateRoomId();
-      const room = rooms.find(room => room.id === roomId);
-      room.userIds = [];
-      room.userIds.push(context.user._id);
-      return roomId;
-    },
   },
 };
 
 module.exports = resolvers;
-
-function generateRoomId() {
-  let roomId = "";
-  const length = 4;
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let created = false;
-  while (!created) {
-    for (let i = 0; i < length; i++) {
-      const randomIndex = randomRangeInt(0, characters.length);
-      roomId += characters[randomIndex];
-    }
-    const roomIds = rooms.map(room => room.id);
-    if (!roomIds.includes(roomId)) {
-      created = true;
-    }
-  }
-  rooms.push({ id: roomId });
-  function destroyRoom() {
-    const roomIndex = rooms.findIndex(room => room.id === roomId);
-    rooms.splice(roomIndex, 1);
-  }
-  setTimeout(destroyRoom, 10000000);
-  return roomId;
-}
-
-function randomRangeInt(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}

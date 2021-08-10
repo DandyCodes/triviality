@@ -1,25 +1,19 @@
-import { useMutation } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import React from "react";
 import { Link } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
-import { CREATE_ROOM } from "../utils/mutations";
+import { ASK_FOR_UNIQUE_ROOM_ID } from "../utils/queries";
 
 const Home = () => {
-  const [createRoom] = useMutation(CREATE_ROOM);
-  const handleCreateQuiz = async () => {
-    try {
-      const { data } = await createRoom();
-      window.location.assign(`/room/${data.createRoom}`);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const [askForUniqueRoomId, { data }] = useLazyQuery(ASK_FOR_UNIQUE_ROOM_ID);
   return (
     <main>
       <div>Welcome</div>
       <Link to={`/users/`}>View users.</Link>
-      {clientAuth.isLoggedIn() ? (
-        <button onClick={handleCreateQuiz}>Create Quiz.</button>
+      {data ? (
+        window.location.assign(`/room/${data.askForUniqueRoomId}`)
+      ) : clientAuth.isLoggedIn() ? (
+        <button onClick={askForUniqueRoomId}>Create Quiz.</button>
       ) : (
         <h1>Log in to create or join a quiz</h1>
       )}

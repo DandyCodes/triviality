@@ -14,8 +14,8 @@ const serverAuth = {
     try {
       const { data } = jwt.verify(token, secret, { maxAge });
       req.user = data;
-    } catch {
-      console.log("Invalid token");
+    } catch (err) {
+      console.log(err);
     }
     return req;
   },
