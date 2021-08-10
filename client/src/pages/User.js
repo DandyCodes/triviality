@@ -19,10 +19,10 @@ const User = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-  if (!user?.name) {
+  if (!user?.nickname) {
     return <h1>You need to log in</h1>;
   }
-  return <h2>{userId ? `${user.name}` : "You"}</h2>;
+  return <h2>{userId ? `${user.nickname}` : "You"}</h2>;
 };
 
 export default User;

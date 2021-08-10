@@ -11,7 +11,7 @@ const UserList = ({ users, title }) => {
       {users &&
         users.map(user => (
           <section key={user._id}>
-            <h4>{user.name}</h4>
+            <h4>{user.nickname}</h4>
             <Link to={`/users/${user._id}`}>View User</Link>
           </section>
         ))}

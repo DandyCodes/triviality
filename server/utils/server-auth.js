@@ -20,8 +20,8 @@ const serverAuth = {
     return req;
   },
 
-  signToken: function ({ email, name, _id }) {
-    const payload = { email, name, _id };
+  signToken: function ({ email, nickname, _id }) {
+    const payload = { email, nickname, _id };
     return jwt.sign({ data: payload }, secret, { expiresIn: maxAge });
   },
 };

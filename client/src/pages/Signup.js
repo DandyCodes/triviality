@@ -6,7 +6,7 @@ import clientAuth from "../utils/client-auth";
 
 const Signup = () => {
   const [formState, setFormState] = useState({
-    name: "",
+    nickname: "",
     email: "",
     password: "",
   });
@@ -41,10 +41,10 @@ const Signup = () => {
       ) : (
         <form onSubmit={handleFormSubmit}>
           <input
-            placeholder="Display Name"
-            name="name"
+            placeholder="Nickname"
+            name="nickname"
             type="text"
-            value={formState.name}
+            value={formState.nickname}
             onChange={handleChange}
           />
           <input

@@ -4,7 +4,7 @@ export const GET_USERS = gql`
   query users {
     users {
       _id
-      name
+      nickname
     }
   }
 `;
@@ -13,7 +13,7 @@ export const GET_USER = gql`
   query user($userId: ID!) {
     user(userId: $userId) {
       _id
-      name
+      nickname
     }
   }
 `;
@@ -22,7 +22,7 @@ export const GET_ME = gql`
   query me {
     me {
       _id
-      name
+      nickname
     }
   }
 `;

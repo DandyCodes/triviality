@@ -5,12 +5,12 @@ socket.on("privateMessage", message => {
   console.log(message);
 });
 
-const ioClientController = {
-  async joinIoRoom(roomId) {
+const ioClient = {
+  async joinRoom(roomId) {
     const decoded = await clientAuth.getDecodedToken();
-    const name = decoded?.data?.name;
-    socket.emit("joinRoom", { roomId, name });
+    const nickname = decoded?.data?.nickname;
+    socket.emit("joinRoom", { roomId, nickname });
   },
 };
 
-export default ioClientController;
+export default ioClient;

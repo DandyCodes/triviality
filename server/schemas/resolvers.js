@@ -1,7 +1,7 @@
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/server-auth");
 const { User } = require("../models");
-const ioServerController = require("../controllers/io-server-controller");
+const ioServer = require("../controllers/io-server");
 
 const resolvers = {
   Query: {
@@ -24,20 +24,20 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      return ioServerController.getUsersInRoom(roomId);
+      return ioServer.getUsersInRoom(roomId);
     },
 
     askForUniqueRoomId: async (_, __, context) => {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      return ioServerController.generateUniqueRoomId(4);
+      return ioServer.generateUniqueRoomId(4);
     },
   },
 
   Mutation: {
-    addUser: async (_, { name, email, password }) => {
-      const user = await User.create({ name, email, password });
+    addUser: async (_, { nickname, email, password }) => {
+      const user = await User.create({ nickname, email, password });
       const token = signToken(user);
       return { token, user };
     },

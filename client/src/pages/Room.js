@@ -1,7 +1,7 @@
 import React from "react";
 import { Redirect, useParams } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
-import ioClientController from "../controllers/io-client";
+import ioClient from "../controllers/io-client";
 import RoomMembers from "../components/RoomMembers";
 
 const Room = () => {
@@ -9,7 +9,7 @@ const Room = () => {
   if (!clientAuth.isLoggedIn()) {
     return <Redirect to="/" />;
   }
-  ioClientController.joinIoRoom(roomId);
+  ioClient.joinRoom(roomId);
   return (
     <main>
       <h1>Room ID: {roomId}</h1>

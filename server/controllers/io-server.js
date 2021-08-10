@@ -1,7 +1,7 @@
 const chalk = require("chalk");
 const { randomRangeInt } = require("../utils/helpers");
 
-const ioServerController = {
+const ioServer = {
   io: null,
 
   config(io) {
@@ -10,8 +10,8 @@ const ioServerController = {
       console.log(`Client ${chalk.blueBright(socket.id)} connected`);
       await socket.emit("privateMessage", "Connected");
 
-      socket.on("joinRoom", async ({ roomId, name }) => {
-        socket.name = name;
+      socket.on("joinRoom", async ({ roomId, nickname }) => {
+        socket.nickname = nickname;
         for (const room of socket.rooms) {
           if (room.length < 20 && room !== roomId) {
             await socket.leave(room);
@@ -29,15 +29,20 @@ const ioServerController = {
 
   getUsersInRoom(roomId) {
     const socketIds = Array.from(this.io.sockets.adapter.rooms.get(roomId));
-    let names = [];
+    let nicknames = [];
     for (const socketId of socketIds) {
       const socket = this.io.sockets.sockets.get(socketId);
-      names.push(socket.name);
+      nicknames.push(socket.nickname);
     }
-    return names;
+    return nicknames;
+  },
+
+  getSocketFromNickName(nickname) {
+    console.log(this.io.sockets);
   },
 
   generateUniqueRoomId(length) {
+    // this.getSocketFromNickName();
     let roomId;
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let unique = false;
@@ -55,4 +60,4 @@ const ioServerController = {
   },
 };
 
-module.exports = ioServerController;
+module.exports = ioServer;
