@@ -1,8 +1,11 @@
 import clientAuth from "../utils/client-auth";
 import socketClient from "socket.io-client";
 const socket = socketClient();
-socket.on("privateMessage", message => {
+socket.on("getNickname", async message => {
   console.log(message);
+  const decoded = await clientAuth.getDecodedToken();
+  const nickname = decoded?.data?.nickname;
+  socket.emit("sendNickname", nickname);
 });
 
 const ioClient = {

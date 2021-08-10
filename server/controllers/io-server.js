@@ -9,10 +9,13 @@ const ioServer = {
     this.io = io;
     this.io.on("connection", async socket => {
       console.log(`Client ${chalk.blueBright(socket.id)} connected`);
-      await socket.emit("privateMessage", "Connected");
+      await socket.emit("getNickname", "Connected");
+
+      socket.on("sendNickname", nickname => {
+        socket.nickname = nickname;
+      });
 
       socket.on("joinRoom", async ({ roomId, nickname }) => {
-        socket.nickname = nickname;
         for (const room of socket.rooms) {
           if (room.length < 20 && room !== roomId) {
             await socket.leave(room);
@@ -23,9 +26,9 @@ const ioServer = {
     });
   },
 
-  getRooms() {
-    const rooms = Array.from(this.io.sockets.adapter.rooms.keys());
-    return rooms.filter(room => room.length < 20);
+  getRoomIds() {
+    const roomIds = Array.from(this.io.sockets.adapter.rooms.keys());
+    return roomIds.filter(room => room.length < 20);
   },
 
   getUsersInRoom(roomId) {
@@ -39,11 +42,17 @@ const ioServer = {
   },
 
   getSocketFromNickName(nickname) {
-    console.log(this.io.sockets);
+    if (!nickname) return;
+    for (const key of this.io.sockets.sockets.keys()) {
+      const socket = this.io.sockets.sockets.get(key);
+      const socketNickname = socket.nickname;
+      if (socketNickname === nickname) {
+        return socket;
+      }
+    }
   },
 
   generateUniqueRoomId(length) {
-    // this.getSocketFromNickName();
     let roomId;
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let uniqueAndNotProfane = false;
@@ -54,7 +63,7 @@ const ioServer = {
         roomId += characters[randomIndex];
       }
       if (
-        !this.getRooms().includes(roomId) &&
+        !this.getRoomIds().includes(roomId) &&
         !profanityFilter.isProfane(roomId)
       ) {
         uniqueAndNotProfane = true;

@@ -31,7 +31,11 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      return ioServer.generateUniqueRoomId(4);
+      const uniqueRoomId = ioServer.generateUniqueRoomId(4);
+      // get the creator to join the room immediately
+      const socket = ioServer.getSocketFromNickName(context.user.nickname);
+      await socket.join(uniqueRoomId);
+      return uniqueRoomId;
     },
   },
 
