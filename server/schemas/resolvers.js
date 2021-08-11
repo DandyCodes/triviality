@@ -32,7 +32,7 @@ const resolvers = {
         throw new AuthenticationError("Must be logged in");
       }
       const uniqueRoomId = ioServer.generateUniqueRoomId(4);
-      // get the creator to join the room immediately
+      // put the creator in the room immediately
       const socket = ioServer.getSocketFromNickname(context.user.nickname);
       socket.createdRoom = uniqueRoomId;
       await socket.join(uniqueRoomId);
