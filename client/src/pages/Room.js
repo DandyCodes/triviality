@@ -3,6 +3,7 @@ import { Redirect, useParams } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
 import ioClient from "../controllers/io-client";
 import RoomMembers from "../components/RoomMembers";
+import RoomControls from "../components/RoomControls";
 import { useQuery } from "@apollo/client";
 import { GET_ROOM_MEMBERS } from "../utils/queries";
 
@@ -21,6 +22,7 @@ const Room = () => {
     <main>
       <h1>Room ID: {roomId}</h1>
       <RoomMembers roomId={roomId}></RoomMembers>
+      <RoomControls roomId={roomId}></RoomControls>
     </main>
   ) : (
     <Redirect to="/" />

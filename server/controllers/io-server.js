@@ -16,6 +16,7 @@ const ioServer = {
       });
 
       socket.on("joinRoom", async ({ roomId, nickname }) => {
+        socket.nickname = nickname;
         for (const room of socket.rooms) {
           if (room.length < 20 && room !== roomId) {
             await socket.leave(room);
@@ -31,17 +32,28 @@ const ioServer = {
     return roomIds.filter(room => room.length < 20);
   },
 
-  getUsersInRoom(roomId) {
-    const socketIds = Array.from(this.io.sockets.adapter.rooms.get(roomId));
-    let nicknames = [];
-    for (const socketId of socketIds) {
+  getSocketsInRoom(roomId) {
+    let sockets = [];
+    const socketIdsInRoom = Array.from(
+      this.io.sockets.adapter.rooms.get(roomId)
+    );
+    for (const socketId of socketIdsInRoom) {
       const socket = this.io.sockets.sockets.get(socketId);
-      nicknames.push(socket.nickname);
+      sockets.push(socket);
+    }
+    return sockets;
+  },
+
+  getNicknamesInRoom(roomId) {
+    nicknames = new Set();
+    const sockets = this.getSocketsInRoom(roomId);
+    for (const socket of sockets) {
+      nicknames.add(socket.nickname);
     }
     return nicknames;
   },
 
-  getSocketFromNickName(nickname) {
+  getSocketFromNickname(nickname) {
     if (!nickname) return;
     for (const key of this.io.sockets.sockets.keys()) {
       const socket = this.io.sockets.sockets.get(key);

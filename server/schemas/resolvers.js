@@ -24,7 +24,7 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      return ioServer.getUsersInRoom(roomId);
+      return ioServer.getNicknamesInRoom(roomId);
     },
 
     askForUniqueRoomId: async (_, __, context) => {
@@ -33,9 +33,21 @@ const resolvers = {
       }
       const uniqueRoomId = ioServer.generateUniqueRoomId(4);
       // get the creator to join the room immediately
-      const socket = ioServer.getSocketFromNickName(context.user.nickname);
+      const socket = ioServer.getSocketFromNickname(context.user.nickname);
+      socket.createdRoom = uniqueRoomId;
       await socket.join(uniqueRoomId);
       return uniqueRoomId;
+    },
+
+    isRoomCreator: async (_, { roomId }, context) => {
+      const socketsInRoom = ioServer.getSocketsInRoom(roomId);
+      let nicknameOfRoomCreator;
+      for (const socket of socketsInRoom) {
+        if (socket.createdRoom === roomId) {
+          nicknameOfRoomCreator = socket.nickname;
+        }
+      }
+      return nicknameOfRoomCreator === context.user.nickname;
     },
   },
 

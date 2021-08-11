@@ -19,6 +19,7 @@ const typeDefs = gql`
     me: User
     askForUniqueRoomId: String
     getRoomMembers(roomId: String!): [String]
+    isRoomCreator(roomId: String!): Boolean
   }
 
   type Mutation {

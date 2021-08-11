@@ -12,7 +12,9 @@ const RoomMembers = ({ roomId }) => {
     <aside>
       <h2>Members</h2>
       {data
-        ? data.getRoomMembers.map(member => <h5 key={member}>{member}</h5>)
+        ? Array.from(data.getRoomMembers).map((member, index) => (
+            <h5 key={index}>{member}</h5>
+          ))
         : null}
     </aside>
   );

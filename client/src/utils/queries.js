@@ -38,3 +38,9 @@ export const ASK_FOR_UNIQUE_ROOM_ID = gql`
     askForUniqueRoomId
   }
 `;
+
+export const IS_ROOM_CREATOR = gql`
+  query isRoomCreator($roomId: String!) {
+    isRoomCreator(roomId: $roomId)
+  }
+`;
