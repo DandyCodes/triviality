@@ -78,11 +78,11 @@ const resolvers = {
       return User.findOneAndDelete({ _id: context.user._id });
     },
 
-    requestToBeginQuiz: async (_, { questions }, context) => {
+    requestToBeginQuiz: async (_, { questions, rounds }, context) => {
       if (!context.user) {
         throw new AuthenticationError("Must be logged in");
       }
-      console.log(questions);
+      console.log(questions, rounds);
       return true;
     },
   },

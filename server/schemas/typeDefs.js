@@ -26,7 +26,7 @@ const typeDefs = gql`
     addUser(nickname: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
     deleteUser: User
-    requestToBeginQuiz(questions: Int!): Boolean
+    requestToBeginQuiz(questions: Int!, rounds: Int!): Boolean
   }
 `;
 
