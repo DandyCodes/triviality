@@ -30,8 +30,8 @@ app.get("*", (req, res) => {
 const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer);
-const ioServerController = require("./controllers/io-server-controller");
-ioServerController.config(io);
+const ioServer = require("./controllers/io-server");
+ioServer.config(io);
 
 mongooseConnection.once("open", () => {
   httpServer.listen(PORT, () => {

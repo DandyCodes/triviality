@@ -61,7 +61,7 @@ function App() {
             <Route exact path="/users/:userId">
               <User />
             </Route>
-            <Route exact path="/room/:roomId">
+            <Route path="/room/:roomId">
               <Room />
             </Route>
           </div>
