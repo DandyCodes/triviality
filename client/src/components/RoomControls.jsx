@@ -9,6 +9,7 @@ const RoomControls = ({ roomId }) => {
   });
   const [quizConfig, setQuizConfig] = useState({
     questions: 5,
+    rounds: 2,
   });
   const [requestToBeginQuiz] = useMutation(REQUEST_TO_BEGIN_QUIZ);
   const handleChange = event => {
@@ -21,7 +22,10 @@ const RoomControls = ({ roomId }) => {
   const handleFormSubmit = async event => {
     event.preventDefault();
     await requestToBeginQuiz({
-      variables: { questions: parseInt(quizConfig.questions) },
+      variables: {
+        questions: parseInt(quizConfig.questions),
+        rounds: parseInt(quizConfig.rounds),
+      },
     });
   };
   return loading ? (
@@ -32,7 +36,7 @@ const RoomControls = ({ roomId }) => {
       {queryData ? (
         queryData.isRoomCreator ? (
           <form onSubmit={handleFormSubmit}>
-            <label htmlFor="questions">Number Of Questions </label>
+            <label htmlFor="questions">Questions: </label>
             <input
               placeholder="Questions"
               type="number"
@@ -41,6 +45,18 @@ const RoomControls = ({ roomId }) => {
               min="1"
               max="40"
               value={quizConfig.questions}
+              onChange={handleChange}
+            />
+            <br />
+            <label htmlFor="rounds">Rounds: </label>
+            <input
+              placeholder="Rounds"
+              type="number"
+              id="rounds"
+              name="rounds"
+              min="1"
+              max="10"
+              value={quizConfig.rounds}
               onChange={handleChange}
             />
             <br />
