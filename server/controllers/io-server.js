@@ -1,87 +1,142 @@
-const chalk = require("chalk");
 const { randomRangeInt } = require("../utils/helpers");
 const profanityFilter = require("../utils/profanity-filter");
+const Quiz = require("./quiz");
 
 const ioServer = {
   io: null,
+  IDLength: 4,
+  quizIDLength: 10,
 
-  config(io) {
-    this.io = io;
+  config(_io) {
+    this.io = _io;
     this.io.on("connection", async socket => {
-      console.log(`Client ${chalk.blueBright(socket.id)} connected`);
-      await socket.emit("getNickname", "Connected");
-
-      socket.on("sendNickname", nickname => {
+      socket.on("nicknameProvided", nickname => {
         socket.nickname = nickname;
-      });
 
-      socket.on("joinRoom", async ({ roomId, nickname }) => {
-        socket.nickname = nickname;
-        for (const room of socket.rooms) {
-          if (room.length < 20 && room !== roomId) {
-            await socket.leave(room);
+        socket.on("createRoom", async () => {
+          const room = this.generateUniqueRoom(this.IDLength);
+          socket.createdRoom = room;
+          await this.putSocketInRoom(socket, room);
+        });
+
+        socket.on("joinRoom", async room => {
+          if (socket.rooms.has(room)) return;
+          if (!this.getAllRooms().includes(room)) return;
+          await this.putSocketInRoom(socket, room);
+        });
+
+        socket.on("startQuiz", async ({ questions, rounds, room }) => {
+          const quizRoom = this.generateUniqueRoom(this.quizIDLength);
+          const sockets = this.getSockets(room);
+          for (const socket of sockets) {
+            await this.putSocketInRoom(socket, quizRoom);
           }
-        }
-        await socket.join(roomId);
+          const nicknames = this.getUniqueNicknames(sockets);
+          const participants = nicknames.map(nickname => ({
+            nickname,
+            score: 0,
+          }));
+          const quiz = new Quiz(
+            this.io,
+            sockets,
+            participants,
+            quizRoom,
+            questions,
+            rounds
+          );
+          quiz.Start();
+        });
+
+        socket.on("disconnecting", async () => {
+          await this.leaveAllRoomsAndNotify(socket);
+        });
       });
+
+      socket.emit("askNickname");
     });
   },
 
-  getRoomIds() {
-    const roomIds = Array.from(this.io.sockets.adapter.rooms.keys());
-    return roomIds.filter(room => room.length < 20);
+  async putSocketInRoom(socket, room) {
+    await this.leaveAllRoomsAndNotify(socket);
+    await socket.join(room);
+    if (room.length === this.IDLength) {
+      await socket.emit("roomJoined", room);
+      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
+    }
+    if (room.length === this.quizIDLength) {
+      await socket.emit("quizJoined", room);
+    }
   },
 
-  getSocketsInRoom(roomId) {
+  getRoomState(room) {
+    const sockets = this.getSockets(room) ?? [];
+    const nicknames = this.getUniqueNicknames(sockets);
+    const creator = sockets.find(
+      socket => socket.createdRoom === room
+    )?.nickname;
+    return {
+      nicknames,
+      creator: creator,
+    };
+  },
+
+  async leaveAllRoomsAndNotify(socket) {
+    if (!socket) return;
+    const rooms = socket.rooms ?? new Set();
+    for (const room of rooms) {
+      if (room.length === 20) continue;
+      await socket.leave(room);
+      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
+    }
+  },
+
+  getUniqueNicknames(sockets) {
+    let nicknames = new Set();
+    if (sockets) {
+      for (const socket of sockets) {
+        if (!socket.nickname) continue;
+        nicknames.add(socket.nickname);
+      }
+    }
+    return Array.from(nicknames);
+  },
+
+  getSockets(room) {
     let sockets = [];
-    const socketIdsInRoom = Array.from(
-      this.io.sockets.adapter.rooms.get(roomId)
-    );
-    for (const socketId of socketIdsInRoom) {
+    const socketIds = this.io.sockets.adapter.rooms.get(room) ?? new Set();
+    for (const socketId of socketIds) {
       const socket = this.io.sockets.sockets.get(socketId);
       sockets.push(socket);
     }
     return sockets;
   },
 
-  getNicknamesInRoom(roomId) {
-    nicknames = new Set();
-    const sockets = this.getSocketsInRoom(roomId);
-    for (const socket of sockets) {
-      nicknames.add(socket.nickname);
-    }
-    return nicknames;
+  getAllRooms() {
+    return Array.from(this.io.sockets.adapter.rooms.keys()).filter(
+      room => room.length < 20
+    );
   },
 
-  getSocketFromNickname(nickname) {
-    if (!nickname) return;
-    for (const key of this.io.sockets.sockets.keys()) {
-      const socket = this.io.sockets.sockets.get(key);
-      const socketNickname = socket.nickname;
-      if (socketNickname === nickname) {
-        return socket;
-      }
-    }
-  },
-
-  generateUniqueRoomId(length) {
-    let roomId;
+  generateUniqueRoom(length) {
+    let room;
+    const rooms = this.getAllRooms();
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let uniqueAndNotProfane = false;
-    while (!uniqueAndNotProfane) {
-      roomId = "";
+    let isInUse = true;
+    let isProfane = true;
+    while (isInUse || isProfane) {
+      room = "";
       for (let i = 0; i < length; i++) {
         const randomIndex = randomRangeInt(0, characters.length);
-        roomId += characters[randomIndex];
+        room += characters[randomIndex];
       }
-      if (
-        !this.getRoomIds().includes(roomId) &&
-        !profanityFilter.isProfane(roomId)
-      ) {
-        uniqueAndNotProfane = true;
+      if (!rooms.includes(room)) {
+        isInUse = false;
+      }
+      if (!profanityFilter.isProfane(room)) {
+        isProfane = false;
       }
     }
-    return roomId;
+    return room;
   },
 };
 

@@ -2,6 +2,7 @@ const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/server-auth");
 const { User } = require("../models");
 const ioServer = require("../controllers/io-server");
+const Quiz = require("../controllers/quiz");
 
 const resolvers = {
   Query: {
@@ -18,36 +19,6 @@ const resolvers = {
         throw new AuthenticationError("Must be logged in");
       }
       return User.findOne({ _id: context.user._id });
-    },
-
-    getRoomMembers: async (_, { roomId }, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      return ioServer.getNicknamesInRoom(roomId);
-    },
-
-    askForUniqueRoomId: async (_, __, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      const uniqueRoomId = ioServer.generateUniqueRoomId(4);
-      // put the creator in the room immediately
-      const socket = ioServer.getSocketFromNickname(context.user.nickname);
-      socket.createdRoom = uniqueRoomId;
-      await socket.join(uniqueRoomId);
-      return uniqueRoomId;
-    },
-
-    isRoomCreator: async (_, { roomId }, context) => {
-      const socketsInRoom = ioServer.getSocketsInRoom(roomId);
-      let nicknameOfRoomCreator;
-      for (const socket of socketsInRoom) {
-        if (socket.createdRoom === roomId) {
-          nicknameOfRoomCreator = socket.nickname;
-        }
-      }
-      return nicknameOfRoomCreator === context.user.nickname;
     },
   },
 
@@ -76,14 +47,6 @@ const resolvers = {
         throw new AuthenticationError("Must be logged in");
       }
       return User.findOneAndDelete({ _id: context.user._id });
-    },
-
-    requestToBeginQuiz: async (_, { questions, rounds }, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      console.log(questions, rounds);
-      return true;
     },
   },
 };

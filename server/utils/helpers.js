@@ -2,4 +2,7 @@ function randomRangeInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-module.exports = { randomRangeInt };
+const delay = milliseconds =>
+  new Promise(resolve => setTimeout(resolve, milliseconds));
+
+module.exports = { randomRangeInt, delay };

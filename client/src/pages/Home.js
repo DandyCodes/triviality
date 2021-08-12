@@ -1,43 +1,51 @@
-import { useLazyQuery } from "@apollo/client";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
-import { ASK_FOR_UNIQUE_ROOM_ID } from "../utils/queries";
+import ioClient from "../controllers/io-client";
 
 const Home = () => {
   const history = useHistory();
-  const [askForUniqueRoomId, { data }] = useLazyQuery(ASK_FOR_UNIQUE_ROOM_ID);
-  const [roomId, setRoomId] = useState("");
-  function go() {
-    history.push(`/room/${data.askForUniqueRoomId}`);
-  }
-  const handleChange = event => {
-    const { value } = event.target;
-    setRoomId(value);
+  const [formState, setFormState] = useState({
+    room: "",
+  });
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setFormState({
+      ...formState,
+      [name]: value,
+    });
   };
-  const handleFormSubmit = event => {
-    event.preventDefault();
-    return window.location.assign(`/room/${roomId}`);
+  const handleFormSubmit = e => {
+    e.preventDefault();
+    return ioClient.joinRoom(formState.room);
   };
+  const joinRoom = event => {
+    const room = event.detail.room;
+    history.push(`/room/${room}`);
+  };
+  useEffect(() => {
+    window.addEventListener("roomJoined", joinRoom);
+    return () => {
+      window.removeEventListener("roomJoined", joinRoom);
+    };
+  });
   return (
     <main>
       <div>Welcome</div>
       <Link to={`/users/`}>View users.</Link>
-      {data ? (
-        setTimeout(go)
-      ) : clientAuth.isLoggedIn() ? (
+      {clientAuth.isLoggedIn() ? (
         <Fragment>
           <form onSubmit={handleFormSubmit}>
             <input
               onChange={handleChange}
-              name="roomId"
+              name="room"
               type="text"
-              placeholder="Enter Room ID"
+              placeholder="Enter Room"
             ></input>
             <br></br>
             <input type="submit"></input>
           </form>
-          <button onClick={askForUniqueRoomId}>Create Quiz.</button>
+          <button onClick={ioClient.createRoom}>Create Quiz.</button>
         </Fragment>
       ) : (
         <h1>Log in to create or join a quiz</h1>
