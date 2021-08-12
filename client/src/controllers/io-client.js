@@ -59,6 +59,10 @@ const ioClient = {
   startQuiz(questions, rounds) {
     socket.emit("startQuiz", { questions, rounds, room: this._currentRoom });
   },
+
+  respondToQuestion(question, response) {
+    socket.emit("respondToQuestion", { question, response });
+  },
 };
 
 export default ioClient;
