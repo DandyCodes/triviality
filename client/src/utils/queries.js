@@ -28,19 +28,13 @@ export const GET_ME = gql`
 `;
 
 export const GET_ROOM_MEMBERS = gql`
-  query getRoomMembers($roomId: String!) {
-    getRoomMembers(roomId: $roomId)
-  }
-`;
-
-export const ASK_FOR_UNIQUE_ROOM_ID = gql`
-  query askForUniqueRoomId {
-    askForUniqueRoomId
+  query getRoomMembers($room: String!) {
+    getRoomMembers(room: $room)
   }
 `;
 
 export const IS_ROOM_CREATOR = gql`
-  query isRoomCreator($roomId: String!) {
-    isRoomCreator(roomId: $roomId)
+  query isRoomCreator($room: String!) {
+    isRoomCreator(room: $room)
   }
 `;

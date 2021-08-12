@@ -23,9 +23,3 @@ export const LOGIN = gql`
     }
   }
 `;
-
-export const REQUEST_TO_BEGIN_QUIZ = gql`
-  mutation requestToBeginQuiz($questions: Int!, $rounds: Int!) {
-    requestToBeginQuiz(questions: $questions, rounds: $rounds)
-  }
-`;

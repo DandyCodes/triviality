@@ -1,18 +1,36 @@
 import clientAuth from "../utils/client-auth";
 import socketClient from "socket.io-client";
 const socket = socketClient();
-socket.on("getNickname", async message => {
-  console.log(message);
+
+socket.on("askNickname", async () => {
   const decoded = await clientAuth.getDecodedToken();
-  const nickname = decoded?.data?.nickname;
-  socket.emit("sendNickname", nickname);
+  socket.emit("nicknameProvided", decoded?.data?.nickname);
+});
+
+socket.on("roomJoined", room => {
+  ioClient._currentRoom = room;
+  const roomJoinedEvent = new CustomEvent("roomJoined", { detail: { room } });
+  window.dispatchEvent(roomJoinedEvent);
+});
+
+socket.on("updateRoom", () => {
+  const updateRoomEvent = new CustomEvent("updateRoom");
+  window.dispatchEvent(updateRoomEvent);
 });
 
 const ioClient = {
-  async joinRoom(roomId) {
-    const decoded = await clientAuth.getDecodedToken();
-    const nickname = decoded?.data?.nickname;
-    socket.emit("joinRoom", { roomId, nickname });
+  _currentRoom: "",
+
+  createRoom() {
+    socket.emit("createRoom");
+  },
+
+  joinRoom(room) {
+    socket.emit("joinRoom", room);
+  },
+
+  isInRoom(room) {
+    return room === this._currentRoom;
   },
 };
 

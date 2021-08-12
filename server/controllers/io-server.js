@@ -1,87 +1,108 @@
-const chalk = require("chalk");
 const { randomRangeInt } = require("../utils/helpers");
 const profanityFilter = require("../utils/profanity-filter");
 
 const ioServer = {
   io: null,
 
-  config(io) {
-    this.io = io;
+  config(_io) {
+    this.io = _io;
     this.io.on("connection", async socket => {
-      console.log(`Client ${chalk.blueBright(socket.id)} connected`);
-      await socket.emit("getNickname", "Connected");
-
-      socket.on("sendNickname", nickname => {
+      socket.on("nicknameProvided", nickname => {
         socket.nickname = nickname;
+
+        socket.on("createRoom", async () => {
+          const room = this.generateUniqueRoom(4);
+          socket.createdRoom = room;
+          await this.putSocketInRoom(socket, room);
+        });
+
+        socket.on("joinRoom", async room => {
+          if (socket.rooms.has(room)) return;
+          if (!this.getAllRooms().includes(room)) return;
+          await this.putSocketInRoom(socket, room);
+        });
+
+        socket.on("disconnecting", async () => {
+          await this.leaveAllRoomsAndNotify(socket);
+        });
       });
 
-      socket.on("joinRoom", async ({ roomId, nickname }) => {
-        socket.nickname = nickname;
-        for (const room of socket.rooms) {
-          if (room.length < 20 && room !== roomId) {
-            await socket.leave(room);
-          }
-        }
-        await socket.join(roomId);
-      });
+      socket.emit("askNickname");
     });
   },
 
-  getRoomIds() {
-    const roomIds = Array.from(this.io.sockets.adapter.rooms.keys());
-    return roomIds.filter(room => room.length < 20);
+  isRoomCreator(nickname, room) {
+    const sockets = this.getSockets(room);
+    const socket = sockets.find(sock => sock.nickname === nickname);
+    return socket?.createdRoom === room;
   },
 
-  getSocketsInRoom(roomId) {
+  async putSocketInRoom(socket, room) {
+    await this.leaveAllRoomsAndNotify(socket);
+    await socket.join(room);
+    await socket.emit("roomJoined", room);
+    const nicknames = this.getUniqueNicknames(this.getSockets(room));
+    await this.io.to(room).emit("updateRoom", nicknames);
+  },
+
+  async leaveAllRoomsAndNotify(socket) {
+    if (!socket) return;
+    const rooms = socket.rooms ?? new Set();
+    for (const room of rooms) {
+      if (room.length === 20) continue;
+      await socket.leave(room);
+      const nicknames = this.getUniqueNicknames(this.getSockets(room));
+      await this.io.to(room).emit("updateRoom", nicknames);
+    }
+  },
+
+  getUniqueNicknames(sockets) {
+    let nicknames = new Set();
+    if (sockets) {
+      for (const socket of sockets) {
+        if (!socket.nickname) continue;
+        nicknames.add(socket.nickname);
+      }
+    }
+    return Array.from(nicknames);
+  },
+
+  getSockets(room) {
     let sockets = [];
-    const socketIdsInRoom = Array.from(
-      this.io.sockets.adapter.rooms.get(roomId)
-    );
-    for (const socketId of socketIdsInRoom) {
+    const socketIds = this.io.sockets.adapter.rooms.get(room) ?? new Set();
+    for (const socketId of socketIds) {
       const socket = this.io.sockets.sockets.get(socketId);
       sockets.push(socket);
     }
     return sockets;
   },
 
-  getNicknamesInRoom(roomId) {
-    nicknames = new Set();
-    const sockets = this.getSocketsInRoom(roomId);
-    for (const socket of sockets) {
-      nicknames.add(socket.nickname);
-    }
-    return nicknames;
+  getAllRooms() {
+    return Array.from(this.io.sockets.adapter.rooms.keys()).filter(
+      room => room.length < 20
+    );
   },
 
-  getSocketFromNickname(nickname) {
-    if (!nickname) return;
-    for (const key of this.io.sockets.sockets.keys()) {
-      const socket = this.io.sockets.sockets.get(key);
-      const socketNickname = socket.nickname;
-      if (socketNickname === nickname) {
-        return socket;
-      }
-    }
-  },
-
-  generateUniqueRoomId(length) {
-    let roomId;
+  generateUniqueRoom(length) {
+    let room;
+    const rooms = this.getAllRooms();
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let uniqueAndNotProfane = false;
-    while (!uniqueAndNotProfane) {
-      roomId = "";
+    let isInUse = true;
+    let isProfane = true;
+    while (isInUse || isProfane) {
+      room = "";
       for (let i = 0; i < length; i++) {
         const randomIndex = randomRangeInt(0, characters.length);
-        roomId += characters[randomIndex];
+        room += characters[randomIndex];
       }
-      if (
-        !this.getRoomIds().includes(roomId) &&
-        !profanityFilter.isProfane(roomId)
-      ) {
-        uniqueAndNotProfane = true;
+      if (!rooms.includes(room)) {
+        isInUse = false;
+      }
+      if (!profanityFilter.isProfane(room)) {
+        isProfane = false;
       }
     }
-    return roomId;
+    return room;
   },
 };
 
