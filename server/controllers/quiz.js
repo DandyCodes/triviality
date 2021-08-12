@@ -10,6 +10,7 @@ class Quiz {
   questionHasBeenAnswered = false;
   correctReward = 10;
   incorrectPunishment = 5;
+  __startingQuestions__ = "";
 
   constructor(io, sockets, participants, room, questions, rounds) {
     this.io = io;
@@ -18,6 +19,7 @@ class Quiz {
     this.room = room;
     this.questions = questions;
     this.rounds = rounds;
+    this.__startingQuestions__ = questions;
   }
 
   async Start() {
@@ -77,6 +79,8 @@ class Quiz {
       participants: this.participants,
       questions: this.questions,
       rounds: this.rounds,
+      room: this.room,
+      questionHasBeenAnswered: this.questionHasBeenAnswered,
     };
   }
 
