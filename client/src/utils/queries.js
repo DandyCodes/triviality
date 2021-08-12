@@ -26,9 +26,3 @@ export const GET_ME = gql`
     }
   }
 `;
-
-export const IS_ROOM_CREATOR = gql`
-  query isRoomCreator($room: String!) {
-    isRoomCreator(room: $room)
-  }
-`;

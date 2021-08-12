@@ -10,6 +10,10 @@ class Quiz {
   questionHasBeenAnswered = false;
   correctReward = 10;
   incorrectPunishment = 5;
+  __startingQuestions__ = "";
+  timeout = null;
+  timeLimit = 1000 * 10;
+  pause = 1000 * 2;
 
   constructor(io, sockets, participants, room, questions, rounds) {
     this.io = io;
@@ -18,9 +22,10 @@ class Quiz {
     this.room = room;
     this.questions = questions;
     this.rounds = rounds;
+    this.__startingQuestions__ = questions;
   }
 
-  async Start() {
+  async start() {
     let quizStarted = false;
     for (const socket of this.sockets) {
       socket.on("readyToStartQuiz", () => {
@@ -32,44 +37,68 @@ class Quiz {
           }
         }
         if (allReady) {
-          this.BeginQuiz();
+          this.beginQuiz();
           quizStarted = true;
         }
         const startAnyway = () => {
           if (!quizStarted) {
-            this.BeginQuiz();
+            this.beginQuiz();
           }
         };
-        setTimeout(startAnyway, 5000);
+        setTimeout(startAnyway, 1000 * 8);
       });
       socket.emit("confirmReadyToStartQuiz");
     }
   }
 
-  async BeginQuiz() {
+  async beginQuiz() {
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
-      socket.on("respondToQuestion", ({ question, response }) => {
-        if (this.questionHasBeenAnswered) return;
-        const responder = this.participants.find(
-          participant => participant.nickname === socket.nickname
-        );
-        const correct = question.correct_answer === response;
-        if (correct) {
-          this.questionHasBeenAnswered = true;
-          responder.score += this.correctReward;
-        } else {
-          responder.score -= this.incorrectPunishment;
-        }
-        this.io.to(this.room).emit("updateQuiz", this.getQuizState());
-      });
+      socket.on("respondToQuestion", ({ question, response }) =>
+        this.handleResponse(socket.nickname, question, response)
+      );
     }
     await this.io.to(this.room).emit("updateQuiz", this.getQuizState());
+    this.askNextQuestion();
+  }
+
+  async askNextQuestion() {
+    this.questions--;
+    if (this.questions < 0) {
+      if (this.rounds > 0) {
+        return this.nextRound();
+      } else {
+        return this.endQuiz();
+      }
+    }
     const question = await this.getQuestion();
     if (!question) {
-      return Quit();
+      return this.endQuiz();
     }
-    await this.io.to(this.room).emit("askQuestion", question);
+    this.questionHasBeenAnswered = false;
+    await this.io.to(this.room).emit("askQuestion", {
+      quizState: this.getQuizState(),
+      question,
+      timeLimit: this.timeLimit,
+    });
+    this.timeout = setTimeout(() => this.askNextQuestion(), this.timeLimit);
+  }
+
+  handleResponse(nickname, question, response) {
+    if (this.questionHasBeenAnswered) return;
+    const responder = this.participants.find(
+      participant => participant.nickname === nickname
+    );
+    const correct = question.question.correct_answer === response;
+    if (correct) {
+      clearTimeout(this.timeout);
+      this.questionHasBeenAnswered = true;
+      responder.score += this.correctReward;
+      setTimeout(() => this.askNextQuestion(), this.pause);
+    } else {
+      responder.score -= this.incorrectPunishment;
+    }
+    this.io.to(this.room).emit("updateQuiz", this.getQuizState());
   }
 
   getQuizState() {
@@ -77,6 +106,8 @@ class Quiz {
       participants: this.participants,
       questions: this.questions,
       rounds: this.rounds,
+      room: this.room,
+      questionHasBeenAnswered: this.questionHasBeenAnswered,
     };
   }
 
@@ -88,7 +119,9 @@ class Quiz {
     return parsed.results[0];
   }
 
-  Quit() {
+  nextRound() {}
+
+  endQuiz() {
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
       socket.removeAllListeners("respondToQuestion");

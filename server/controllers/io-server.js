@@ -4,7 +4,7 @@ const Quiz = require("./quiz");
 
 const ioServer = {
   io: null,
-  IDLength: 4,
+  lobbyIDLength: 4,
   quizIDLength: 10,
 
   config(_io) {
@@ -13,24 +13,21 @@ const ioServer = {
       socket.on("nicknameProvided", nickname => {
         socket.nickname = nickname;
 
-        socket.on("createRoom", async () => {
-          const room = this.generateUniqueRoom(this.IDLength);
-          socket.createdRoom = room;
-          await this.putSocketInRoom(socket, room);
+        socket.on("createLobby", async () => {
+          const lobby = this.generateUniqueRoom(this.lobbyIDLength);
+          socket.createdLobby = lobby;
+          await this.putSocketInRoom(socket, lobby);
         });
 
-        socket.on("joinRoom", async room => {
-          if (socket.rooms.has(room)) return;
-          if (!this.getAllRooms().includes(room)) return;
-          await this.putSocketInRoom(socket, room);
+        socket.on("joinLobby", async lobby => {
+          if (socket.rooms.has(lobby)) return;
+          if (!this.getAllRooms().includes(lobby)) return;
+          await this.putSocketInRoom(socket, lobby);
         });
 
-        socket.on("startQuiz", async ({ questions, rounds, room }) => {
+        socket.on("startQuiz", async ({ questions, rounds, lobby }) => {
           const quizRoom = this.generateUniqueRoom(this.quizIDLength);
-          const sockets = this.getSockets(room);
-          for (const socket of sockets) {
-            await this.putSocketInRoom(socket, quizRoom);
-          }
+          const sockets = this.getSockets(lobby);
           const nicknames = this.getUniqueNicknames(sockets);
           const participants = nicknames.map(nickname => ({
             nickname,
@@ -44,7 +41,11 @@ const ioServer = {
             questions,
             rounds
           );
-          quiz.Start();
+          for (const socket of sockets) {
+            await this.putSocketInRoom(socket, quizRoom);
+            await socket.emit("quizJoined", quiz.getQuizState());
+          }
+          quiz.start();
         });
 
         socket.on("disconnecting", async () => {
@@ -59,24 +60,23 @@ const ioServer = {
   async putSocketInRoom(socket, room) {
     await this.leaveAllRoomsAndNotify(socket);
     await socket.join(room);
-    if (room.length === this.IDLength) {
-      await socket.emit("roomJoined", room);
-      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
-    }
-    if (room.length === this.quizIDLength) {
-      await socket.emit("quizJoined", room);
+    if (room.length === this.lobbyIDLength) {
+      const lobby = room;
+      await socket.emit("lobbyJoined", this.getLobbyState(lobby));
+      await this.io.to(lobby).emit("updateLobby", this.getLobbyState(lobby));
     }
   },
 
-  getRoomState(room) {
-    const sockets = this.getSockets(room) ?? [];
+  getLobbyState(lobby) {
+    const sockets = this.getSockets(lobby) ?? [];
     const nicknames = this.getUniqueNicknames(sockets);
     const creator = sockets.find(
-      socket => socket.createdRoom === room
+      socket => socket.createdLobby === lobby
     )?.nickname;
     return {
       nicknames,
       creator: creator,
+      lobby,
     };
   },
 
@@ -86,7 +86,10 @@ const ioServer = {
     for (const room of rooms) {
       if (room.length === 20) continue;
       await socket.leave(room);
-      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
+      if (room.length === this.lobbyIDLength) {
+        const lobby = room;
+        await this.io.to(lobby).emit("updateLobby", this.getLobbyState(lobby));
+      }
     }
   },
 

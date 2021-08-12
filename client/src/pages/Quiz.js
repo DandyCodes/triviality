@@ -26,7 +26,7 @@ const Quiz = () => {
   ) : (
     <main>
       <h1>Quiz</h1>
-      <Question></Question>
+      <Question hasBeenAnswered={quizState.questionHasBeenAnswered}></Question>
       <Members members={quizState.participants}></Members>
       <h3>Questions: {quizState.questions}</h3>
       <h3>Rounds: {quizState.rounds}</h3>

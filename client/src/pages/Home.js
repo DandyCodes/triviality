@@ -6,7 +6,7 @@ import ioClient from "../controllers/io-client";
 const Home = () => {
   const history = useHistory();
   const [formState, setFormState] = useState({
-    room: "",
+    lobby: "",
   });
   const handleChange = e => {
     const { name, value } = e.target;
@@ -17,16 +17,15 @@ const Home = () => {
   };
   const handleFormSubmit = e => {
     e.preventDefault();
-    return ioClient.joinRoom(formState.room);
+    return ioClient.joinLobby(formState.lobby);
   };
-  const joinRoom = event => {
-    const room = event.detail.room;
-    history.push(`/room/${room}`);
+  const joinLobby = event => {
+    history.push(`/lobby/${event.detail.lobby}`);
   };
   useEffect(() => {
-    window.addEventListener("roomJoined", joinRoom);
+    window.addEventListener("lobbyJoined", joinLobby);
     return () => {
-      window.removeEventListener("roomJoined", joinRoom);
+      window.removeEventListener("lobbyJoined", joinLobby);
     };
   });
   return (
@@ -38,14 +37,14 @@ const Home = () => {
           <form onSubmit={handleFormSubmit}>
             <input
               onChange={handleChange}
-              name="room"
+              name="lobby"
               type="text"
-              placeholder="Enter Room"
+              placeholder="Enter Lobby"
             ></input>
             <br></br>
             <input type="submit"></input>
           </form>
-          <button onClick={ioClient.createRoom}>Create Quiz.</button>
+          <button onClick={ioClient.createLobby}>Create Lobby.</button>
         </Fragment>
       ) : (
         <h1>Log in to create or join a quiz</h1>

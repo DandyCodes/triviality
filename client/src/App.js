@@ -12,7 +12,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import User from "./pages/User";
 import Users from "./pages/Users";
-import Room from "./pages/Room";
+import Lobby from "./pages/Lobby";
 import Quiz from "./pages/Quiz";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -62,8 +62,8 @@ function App() {
             <Route exact path="/users/:userId">
               <User />
             </Route>
-            <Route path="/room/:room">
-              <Room />
+            <Route path="/lobby/:room">
+              <Lobby />
             </Route>
             <Route path="/quiz/:room">
               <Quiz />

@@ -20,7 +20,7 @@ const Controls = () => {
   };
   return (
     <aside>
-      <h2>Room Controls</h2>
+      <h2>Controls</h2>
       <label htmlFor="questions">Questions: </label>
       <input
         placeholder="Questions"
