@@ -22,7 +22,6 @@ socket.on("updateRoom", async ({ nicknames, creator }) => {
 });
 
 socket.on("quizJoined", room => {
-  console.log("yeh");
   ioClient._currentRoom = room;
   const quizJoinedEvent = new CustomEvent("quizJoined", { detail: { room } });
   window.dispatchEvent(quizJoinedEvent);
@@ -35,6 +34,11 @@ socket.on("confirmReadyToStartQuiz", () => {
 socket.on("updateQuiz", quizState => {
   const updateQuizEvent = new CustomEvent("updateQuiz", { detail: quizState });
   window.dispatchEvent(updateQuizEvent);
+});
+
+socket.on("askQuestion", question => {
+  const askQuestionEvent = new CustomEvent("askQuestion", { detail: question });
+  window.dispatchEvent(askQuestionEvent);
 });
 
 const ioClient = {
