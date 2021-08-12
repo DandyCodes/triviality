@@ -5,26 +5,27 @@ import ioClient from "../controllers/io-client";
 import Members from "../components/Members";
 import Controls from "../components/Controls";
 
-const Room = () => {
+const Lobby = () => {
   const { room } = useParams();
   const history = useHistory();
-  const [roomState, setRoomState] = useState({
+  const [lobbyState, setLobbyState] = useState({
     nicknames: [],
     isCreator: false,
+    lobby: room,
   });
   const joinQuiz = event => {
     const room = event.detail.room;
     history.push(`/quiz/${room}`);
   };
-  const updateRoom = event => {
-    setRoomState(event.detail);
+  const updateLobby = event => {
+    setLobbyState(event.detail);
   };
   useEffect(() => {
     window.addEventListener("quizJoined", joinQuiz);
-    window.addEventListener("updateRoom", updateRoom);
+    window.addEventListener("updateLobby", updateLobby);
     return () => {
       window.removeEventListener("quizJoined", joinQuiz);
-      window.removeEventListener("updateRoom", updateRoom);
+      window.removeEventListener("updateLobby", updateLobby);
     };
   });
   return !clientAuth.isLoggedIn() || !ioClient.isInRoom(room) ? (
@@ -33,9 +34,9 @@ const Room = () => {
     <main>
       <h1>Room: {room}</h1>
       <Members
-        members={roomState.nicknames.map(nickname => ({ nickname }))}
+        members={lobbyState.nicknames.map(nickname => ({ nickname }))}
       ></Members>
-      {roomState.isCreator ? (
+      {lobbyState.isCreator ? (
         <Controls room={room}></Controls>
       ) : (
         <h4>Waiting...</h4>
@@ -44,4 +45,4 @@ const Room = () => {
   );
 };
 
-export default Room;
+export default Lobby;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import shuffle from "shuffle-array";
 import ioClient from "../controllers/io-client";
 
-const Question = () => {
+const Question = ({ hasBeenAnswered }) => {
   const [question, setQuestion] = useState();
   const [responded, setResponded] = useState(false);
   const askQuestion = event => {
@@ -37,7 +37,7 @@ const Question = () => {
       <section>{question.decodedQuestion}</section>
       <section>
         {question.decodedOptions.map((decodedOption, index) =>
-          responded ? (
+          responded || hasBeenAnswered ? (
             <button key={index} disabled>
               {decodedOption}
             </button>

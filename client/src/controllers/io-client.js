@@ -7,23 +7,28 @@ socket.on("askNickname", async () => {
   socket.emit("nicknameProvided", decoded?.data?.nickname);
 });
 
-socket.on("roomJoined", room => {
-  ioClient._currentRoom = room;
-  const roomJoinedEvent = new CustomEvent("roomJoined", { detail: { room } });
-  window.dispatchEvent(roomJoinedEvent);
-});
-
-socket.on("updateRoom", async ({ nicknames, creator }) => {
-  const decoded = await clientAuth.getDecodedToken();
-  const updateRoomEvent = new CustomEvent("updateRoom", {
-    detail: { nicknames, isCreator: creator === decoded?.data?.nickname },
+socket.on("lobbyJoined", lobbyState => {
+  ioClient.currentRoom = lobbyState.lobby;
+  const lobbyJoinedEvent = new CustomEvent("lobbyJoined", {
+    detail: lobbyState,
   });
-  window.dispatchEvent(updateRoomEvent);
+  window.dispatchEvent(lobbyJoinedEvent);
 });
 
-socket.on("quizJoined", room => {
-  ioClient._currentRoom = room;
-  const quizJoinedEvent = new CustomEvent("quizJoined", { detail: { room } });
+socket.on("updateLobby", async lobbyState => {
+  const decoded = await clientAuth.getDecodedToken();
+  const updateLobbyEvent = new CustomEvent("updateLobby", {
+    detail: {
+      ...lobbyState,
+      isCreator: lobbyState.creator === decoded?.data?.nickname,
+    },
+  });
+  window.dispatchEvent(updateLobbyEvent);
+});
+
+socket.on("quizJoined", quizState => {
+  ioClient.currentRoom = quizState.room;
+  const quizJoinedEvent = new CustomEvent("quizJoined", { detail: quizState });
   window.dispatchEvent(quizJoinedEvent);
 });
 
@@ -42,22 +47,22 @@ socket.on("askQuestion", question => {
 });
 
 const ioClient = {
-  _currentRoom: "",
+  currentRoom: "",
 
-  createRoom() {
-    socket.emit("createRoom");
+  createLobby() {
+    socket.emit("createLobby");
   },
 
-  joinRoom(room) {
-    socket.emit("joinRoom", room);
+  joinLobby(lobby) {
+    socket.emit("joinLobby", lobby);
   },
 
   isInRoom(room) {
-    return room === this._currentRoom;
+    return room === this.currentRoom;
   },
 
   startQuiz(questions, rounds) {
-    socket.emit("startQuiz", { questions, rounds, room: this._currentRoom });
+    socket.emit("startQuiz", { questions, rounds, lobby: this.currentRoom });
   },
 
   respondToQuestion(question, response) {
