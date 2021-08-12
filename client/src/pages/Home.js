@@ -19,13 +19,14 @@ const Home = () => {
     e.preventDefault();
     return ioClient.joinRoom(formState.room);
   };
-  const openRoom = room => {
+  const joinRoom = event => {
+    const room = event.detail.room;
     history.push(`/room/${room}`);
   };
   useEffect(() => {
-    window.addEventListener("roomJoined", e => openRoom(e.detail.room));
+    window.addEventListener("roomJoined", joinRoom);
     return () => {
-      window.removeEventListener("roomJoined", e => openRoom(e.detail.room));
+      window.removeEventListener("roomJoined", joinRoom);
     };
   });
   return (

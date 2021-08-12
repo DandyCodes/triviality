@@ -20,20 +20,6 @@ const resolvers = {
       }
       return User.findOne({ _id: context.user._id });
     },
-
-    isRoomCreator: async (_, { room }, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      return ioServer.isRoomCreator(context.user.nickname, room);
-    },
-
-    getRoomMembers: async (_, { room }, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      return ioServer.getUniqueNicknames(ioServer.getSockets(room));
-    },
   },
 
   Mutation: {

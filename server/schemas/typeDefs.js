@@ -17,8 +17,6 @@ const typeDefs = gql`
     users: [User]!
     user(userId: ID!): User
     me: User
-    getRoomMembers(room: String!): [String]
-    isRoomCreator(room: String!): Boolean
   }
 
   type Mutation {

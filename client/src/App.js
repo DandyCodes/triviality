@@ -13,6 +13,7 @@ import Signup from "./pages/Signup";
 import User from "./pages/User";
 import Users from "./pages/Users";
 import Room from "./pages/Room";
+import Quiz from "./pages/Quiz";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "./controllers/io-client";
@@ -63,6 +64,9 @@ function App() {
             </Route>
             <Route path="/room/:room">
               <Room />
+            </Route>
+            <Route path="/quiz/:room">
+              <Quiz />
             </Route>
           </div>
           <Footer />

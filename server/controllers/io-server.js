@@ -1,8 +1,11 @@
 const { randomRangeInt } = require("../utils/helpers");
 const profanityFilter = require("../utils/profanity-filter");
+const Quiz = require("./quiz");
 
 const ioServer = {
   io: null,
+  IDLength: 4,
+  quizIDLength: 10,
 
   config(_io) {
     this.io = _io;
@@ -11,7 +14,7 @@ const ioServer = {
         socket.nickname = nickname;
 
         socket.on("createRoom", async () => {
-          const room = this.generateUniqueRoom(4);
+          const room = this.generateUniqueRoom(this.IDLength);
           socket.createdRoom = room;
           await this.putSocketInRoom(socket, room);
         });
@@ -20,6 +23,28 @@ const ioServer = {
           if (socket.rooms.has(room)) return;
           if (!this.getAllRooms().includes(room)) return;
           await this.putSocketInRoom(socket, room);
+        });
+
+        socket.on("startQuiz", async ({ questions, rounds, room }) => {
+          const quizRoom = this.generateUniqueRoom(this.quizIDLength);
+          const sockets = this.getSockets(room);
+          for (const socket of sockets) {
+            await this.putSocketInRoom(socket, quizRoom);
+          }
+          const nicknames = this.getUniqueNicknames(sockets);
+          const participants = nicknames.map(nickname => ({
+            nickname,
+            score: 0,
+          }));
+          const quiz = new Quiz(
+            this.io,
+            sockets,
+            participants,
+            quizRoom,
+            questions,
+            rounds
+          );
+          quiz.Start();
         });
 
         socket.on("disconnecting", async () => {
@@ -31,18 +56,28 @@ const ioServer = {
     });
   },
 
-  isRoomCreator(nickname, room) {
-    const sockets = this.getSockets(room);
-    const socket = sockets.find(sock => sock.nickname === nickname);
-    return socket?.createdRoom === room;
-  },
-
   async putSocketInRoom(socket, room) {
     await this.leaveAllRoomsAndNotify(socket);
     await socket.join(room);
-    await socket.emit("roomJoined", room);
-    const nicknames = this.getUniqueNicknames(this.getSockets(room));
-    await this.io.to(room).emit("updateRoom", nicknames);
+    if (room.length === this.IDLength) {
+      await socket.emit("roomJoined", room);
+      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
+    }
+    if (room.length === this.quizIDLength) {
+      await socket.emit("quizJoined", room);
+    }
+  },
+
+  getRoomState(room) {
+    const sockets = this.getSockets(room) ?? [];
+    const nicknames = this.getUniqueNicknames(sockets);
+    const creator = sockets.find(
+      socket => socket.createdRoom === room
+    )?.nickname;
+    return {
+      nicknames,
+      creator: creator,
+    };
   },
 
   async leaveAllRoomsAndNotify(socket) {
@@ -51,8 +86,7 @@ const ioServer = {
     for (const room of rooms) {
       if (room.length === 20) continue;
       await socket.leave(room);
-      const nicknames = this.getUniqueNicknames(this.getSockets(room));
-      await this.io.to(room).emit("updateRoom", nicknames);
+      await this.io.to(room).emit("updateRoom", this.getRoomState(room));
     }
   },
 

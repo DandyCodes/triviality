@@ -13,9 +13,28 @@ socket.on("roomJoined", room => {
   window.dispatchEvent(roomJoinedEvent);
 });
 
-socket.on("updateRoom", () => {
-  const updateRoomEvent = new CustomEvent("updateRoom");
+socket.on("updateRoom", async ({ nicknames, creator }) => {
+  const decoded = await clientAuth.getDecodedToken();
+  const updateRoomEvent = new CustomEvent("updateRoom", {
+    detail: { nicknames, isCreator: creator === decoded?.data?.nickname },
+  });
   window.dispatchEvent(updateRoomEvent);
+});
+
+socket.on("quizJoined", room => {
+  console.log("yeh");
+  ioClient._currentRoom = room;
+  const quizJoinedEvent = new CustomEvent("quizJoined", { detail: { room } });
+  window.dispatchEvent(quizJoinedEvent);
+});
+
+socket.on("confirmReadyToStartQuiz", () => {
+  socket.emit("readyToStartQuiz");
+});
+
+socket.on("updateQuiz", quizState => {
+  const updateQuizEvent = new CustomEvent("updateQuiz", { detail: quizState });
+  window.dispatchEvent(updateQuizEvent);
 });
 
 const ioClient = {
@@ -31,6 +50,10 @@ const ioClient = {
 
   isInRoom(room) {
     return room === this._currentRoom;
+  },
+
+  startQuiz(questions, rounds) {
+    socket.emit("startQuiz", { questions, rounds, room: this._currentRoom });
   },
 };
 
