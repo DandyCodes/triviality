@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 class Quiz {
   participants = [];
   room = "";
@@ -42,7 +44,15 @@ class Quiz {
   }
 
   async BeginQuiz() {
-    this.io.to(this.room).emit("updateQuiz", this.getQuizState());
+    for (const socket of this.sockets) {
+      socket.removeAllListeners("readyToStartQuiz");
+    }
+    await this.io.to(this.room).emit("updateQuiz", this.getQuizState());
+    const question = await this.getQuestion();
+    if (!question) {
+      return Quit();
+    }
+    await this.io.to(this.room).emit("askQuestion", question);
   }
 
   getQuizState() {
@@ -53,7 +63,13 @@ class Quiz {
     };
   }
 
-  async getQuestion(category, difficulty) {}
+  async getQuestion() {
+    const response = await fetch("https://opentdb.com/api.php?amount=1");
+    const parsed = await response.json();
+    return parsed.results[0];
+  }
+
+  Quit() {}
 }
 
 module.exports = Quiz;

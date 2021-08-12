@@ -3,6 +3,7 @@ import { Redirect, useParams } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
 import ioClient from "../controllers/io-client";
 import Members from "../components/Members";
+import Question from "../components/Question";
 
 const Quiz = () => {
   const { room } = useParams();
@@ -25,9 +26,10 @@ const Quiz = () => {
   ) : (
     <main>
       <h1>Quiz</h1>
+      <Question></Question>
+      <Members members={quizState.participants}></Members>
       <h3>Questions: {quizState.questions}</h3>
       <h3>Rounds: {quizState.rounds}</h3>
-      <Members members={quizState.participants}></Members>
     </main>
   );
 };
