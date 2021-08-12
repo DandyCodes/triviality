@@ -32,7 +32,7 @@ const Lobby = () => {
     <Redirect to="/" />
   ) : (
     <main>
-      <h1>Room: {room}</h1>
+      <h1>Lobby: {room}</h1>
       <Members
         members={lobbyState.nicknames.map(nickname => ({ nickname }))}
       ></Members>

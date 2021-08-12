@@ -5,8 +5,11 @@ import ioClient from "../controllers/io-client";
 const Question = ({ hasBeenAnswered }) => {
   const [question, setQuestion] = useState();
   const [responded, setResponded] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(10);
   const askQuestion = event => {
-    const encoded = event.detail;
+    setResponded(false);
+    setTimeRemaining(parseInt(event.detail.timeLimit * 0.001));
+    const encoded = event.detail.question;
     const decodedOptions = shuffle(
       encoded.incorrect_answers
         .map(ans => Buffer.from(ans, "base64").toString())
@@ -27,8 +30,13 @@ const Question = ({ hasBeenAnswered }) => {
     );
   };
   useEffect(() => {
+    const timeOut = setTimeout(
+      () => setTimeRemaining(Math.max(timeRemaining - 1, 0)),
+      1000
+    );
     window.addEventListener("askQuestion", askQuestion);
     return () => {
+      clearTimeout(timeOut);
       window.removeEventListener("askQuestion", askQuestion);
     };
   });
@@ -51,6 +59,7 @@ const Question = ({ hasBeenAnswered }) => {
           )
         )}
       </section>
+      <section>{hasBeenAnswered ? null : timeRemaining}</section>
     </article>
   ) : null;
 };

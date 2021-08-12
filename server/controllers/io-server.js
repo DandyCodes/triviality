@@ -45,7 +45,7 @@ const ioServer = {
             await this.putSocketInRoom(socket, quizRoom);
             await socket.emit("quizJoined", quiz.getQuizState());
           }
-          quiz.Start();
+          quiz.start();
         });
 
         socket.on("disconnecting", async () => {

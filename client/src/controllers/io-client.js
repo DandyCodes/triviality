@@ -41,9 +41,15 @@ socket.on("updateQuiz", quizState => {
   window.dispatchEvent(updateQuizEvent);
 });
 
-socket.on("askQuestion", question => {
-  const askQuestionEvent = new CustomEvent("askQuestion", { detail: question });
+socket.on("askQuestion", ({ quizState, question, timeLimit, timeStamp }) => {
+  const askQuestionEvent = new CustomEvent("askQuestion", {
+    detail: { question, timeLimit, timeStamp },
+  });
   window.dispatchEvent(askQuestionEvent);
+  const updateQuizEvent = new CustomEvent("updateQuiz", {
+    detail: quizState,
+  });
+  window.dispatchEvent(updateQuizEvent);
 });
 
 const ioClient = {
