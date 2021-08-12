@@ -7,6 +7,9 @@ class Quiz {
   rounds = "";
   io = null;
   sockets = [];
+  questionHasBeenAnswered = false;
+  correctReward = 10;
+  incorrectPunishment = 5;
 
   constructor(io, sockets, participants, room, questions, rounds) {
     this.io = io;
@@ -46,6 +49,20 @@ class Quiz {
   async BeginQuiz() {
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
+      socket.on("respondToQuestion", ({ question, response }) => {
+        if (this.questionHasBeenAnswered) return;
+        const responder = this.participants.find(
+          participant => participant.nickname === socket.nickname
+        );
+        const correct = question.correct_answer === response;
+        if (correct) {
+          this.questionHasBeenAnswered = true;
+          responder.score += this.correctReward;
+        } else {
+          responder.score -= this.incorrectPunishment;
+        }
+        this.io.to(this.room).emit("updateQuiz", this.getQuizState());
+      });
     }
     await this.io.to(this.room).emit("updateQuiz", this.getQuizState());
     const question = await this.getQuestion();
@@ -64,12 +81,19 @@ class Quiz {
   }
 
   async getQuestion() {
-    const response = await fetch("https://opentdb.com/api.php?amount=1");
+    const response = await fetch(
+      "https://opentdb.com/api.php?amount=1&encode=base64"
+    );
     const parsed = await response.json();
     return parsed.results[0];
   }
 
-  Quit() {}
+  Quit() {
+    for (const socket of this.sockets) {
+      socket.removeAllListeners("readyToStartQuiz");
+      socket.removeAllListeners("respondToQuestion");
+    }
+  }
 }
 
 module.exports = Quiz;

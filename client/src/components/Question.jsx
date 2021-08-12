@@ -1,20 +1,30 @@
 import { useEffect, useState } from "react";
 import shuffle from "shuffle-array";
-import he from "he";
+import ioClient from "../controllers/io-client";
 
 const Question = () => {
   const [question, setQuestion] = useState();
+  const [responded, setResponded] = useState(false);
   const askQuestion = event => {
     const encoded = event.detail;
-    const decodedOptions = encoded.incorrect_answers
-      .map(ans => he.decode(ans))
-      .concat([he.decode(encoded.correct_answer)]);
-    const decodedQuestion = he.decode(encoded.question);
+    const decodedOptions = shuffle(
+      encoded.incorrect_answers
+        .map(ans => Buffer.from(ans, "base64").toString())
+        .concat([Buffer.from(encoded.correct_answer, "base64").toString()])
+    );
+    const decodedQuestion = Buffer.from(encoded.question, "base64").toString();
     setQuestion({
       ...event.detail,
-      options: shuffle(decodedOptions),
-      question: decodedQuestion,
+      decodedOptions,
+      decodedQuestion,
     });
+  };
+  const respondToQuestion = decodedResponse => {
+    setResponded(true);
+    ioClient.respondToQuestion(
+      question,
+      Buffer.from(decodedResponse).toString("base64")
+    );
   };
   useEffect(() => {
     window.addEventListener("askQuestion", askQuestion);
@@ -24,11 +34,22 @@ const Question = () => {
   });
   return question ? (
     <article>
-      <section>{question.question}</section>
+      <section>{question.decodedQuestion}</section>
       <section>
-        {question.options.map((option, index) => (
-          <h4 key={index}>{option}</h4>
-        ))}
+        {question.decodedOptions.map((decodedOption, index) =>
+          responded ? (
+            <button key={index} disabled>
+              {decodedOption}
+            </button>
+          ) : (
+            <button
+              key={index}
+              onClick={() => respondToQuestion(decodedOption)}
+            >
+              {decodedOption}
+            </button>
+          )
+        )}
       </section>
     </article>
   ) : null;
