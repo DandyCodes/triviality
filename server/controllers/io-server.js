@@ -1,4 +1,4 @@
-const { randomRangeInt } = require("../utils/helpers");
+const { randomRangeInt, delay } = require("../utils/helpers");
 const profanityFilter = require("../utils/profanity-filter");
 const Quiz = require("./quiz");
 
@@ -60,6 +60,7 @@ const ioServer = {
   async putSocketInRoom(socket, room) {
     await this.leaveAllRoomsAndNotify(socket);
     await socket.join(room);
+    await delay(250);
     if (room.length === this.lobbyIDLength) {
       const lobby = room;
       await socket.emit("lobbyJoined", this.getLobbyState(lobby));

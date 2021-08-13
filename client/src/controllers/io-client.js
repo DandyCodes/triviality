@@ -1,5 +1,6 @@
 import clientAuth from "../utils/client-auth";
 import socketClient from "socket.io-client";
+import { delay } from "../utils/helpers";
 const socket = socketClient();
 
 socket.on("askNickname", async () => {
@@ -7,23 +8,29 @@ socket.on("askNickname", async () => {
   socket.emit("nicknameProvided", decoded?.data?.nickname);
 });
 
-socket.on("lobbyJoined", lobbyState => {
+async function sendUpdateLobbyEvent(lobbyState) {
+  const decodedToken = await clientAuth.getDecodedToken();
+  const updateLobbyEvent = new CustomEvent("updateLobby", {
+    detail: {
+      ...lobbyState,
+      isCreator: lobbyState.creator === decodedToken?.data?.nickname,
+    },
+  });
+  window.dispatchEvent(updateLobbyEvent);
+}
+
+socket.on("lobbyJoined", async lobbyState => {
   ioClient.currentRoom = lobbyState.lobby;
   const lobbyJoinedEvent = new CustomEvent("lobbyJoined", {
     detail: lobbyState,
   });
   window.dispatchEvent(lobbyJoinedEvent);
+  await delay(250);
+  await sendUpdateLobbyEvent(lobbyState);
 });
 
 socket.on("updateLobby", async lobbyState => {
-  const decoded = await clientAuth.getDecodedToken();
-  const updateLobbyEvent = new CustomEvent("updateLobby", {
-    detail: {
-      ...lobbyState,
-      isCreator: lobbyState.creator === decoded?.data?.nickname,
-    },
-  });
-  window.dispatchEvent(updateLobbyEvent);
+  await sendUpdateLobbyEvent(lobbyState);
 });
 
 socket.on("quizJoined", quizState => {
