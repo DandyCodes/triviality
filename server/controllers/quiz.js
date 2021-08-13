@@ -16,6 +16,7 @@ class Quiz {
   timeLimit = 1000 * 15;
   pause = 1000 * 2;
   roundBreak = 1000 * 15;
+  token = "";
 
   constructor(
     io,
@@ -40,6 +41,11 @@ class Quiz {
   }
 
   async start() {
+    const response = await fetch(
+      "https://opentdb.com/api_token.php?command=request"
+    );
+    const result = await response.json();
+    this.token = result.token;
     let quizStarted = false;
     for (const socket of this.sockets) {
       socket.on("readyToStartQuiz", () => {
@@ -77,6 +83,10 @@ class Quiz {
   }
 
   async askNextQuestion() {
+    for (const participant of this.participants) {
+      participant.hasResponded = false;
+      participant.correct = false;
+    }
     this.questionsRemaining--;
     if (this.questionsRemaining < 0) {
       if (this.roundsRemaining > 0) {
@@ -91,19 +101,26 @@ class Quiz {
       return this.endQuiz();
     }
     this.questionHasBeenAnswered = false;
-    for (const participant of this.participants) {
-      participant.hasResponded = false;
-    }
-    await this.sendQuestion(question, this.timeLimit, this.getQuizState());
-    this.timeout = setTimeout(() => this.askNextQuestion(), this.timeLimit);
+    await this.sendQuestion(question, this.timeLimit);
+    this.timeout = setTimeout(
+      () => this.revealAnswer(question),
+      this.timeLimit
+    );
   }
 
-  async sendQuestion(question, timeLimit, quizState) {
+  async sendQuestion(question, timeLimit) {
+    question.timeLimit = timeLimit;
+    question.timeStamp = Date.now();
     await this.io.to(this.room).emit("askQuestion", {
       question,
-      timeLimit,
-      quizState,
+      quizState: this.getQuizState(),
     });
+  }
+
+  revealAnswer(question) {
+    clearTimeout(this.timeout);
+    this.io.to(this.room).emit("revealAnswer", question);
+    setTimeout(() => this.askNextQuestion(), this.pause);
   }
 
   handleResponse(nickname, question, response) {
@@ -112,13 +129,14 @@ class Quiz {
       participant => participant.nickname === nickname
     );
     responder.hasResponded = true;
-    const correct = question.question.correct_answer === response;
+    const correct = question.correct_answer === response;
     if (correct) {
-      clearTimeout(this.timeout);
+      responder.correct = true;
       this.questionHasBeenAnswered = true;
       responder.score += this.correctReward;
-      setTimeout(() => this.askNextQuestion(), this.pause);
+      this.revealAnswer(question);
     } else {
+      responder.correct = false;
       responder.score -= this.incorrectPunishment;
       let allResponded = true;
       for (const participant of this.participants) {
@@ -127,8 +145,7 @@ class Quiz {
         }
       }
       if (allResponded) {
-        clearTimeout(this.timeout);
-        setTimeout(() => this.askNextQuestion(), this.pause);
+        this.revealAnswer(question);
       }
     }
     this.io.to(this.room).emit("updateQuiz", this.getQuizState());
@@ -146,7 +163,7 @@ class Quiz {
 
   async getQuestion() {
     const response = await fetch(
-      "https://opentdb.com/api.php?amount=1&encode=base64"
+      `https://opentdb.com/api.php?amount=1&encode=base64&token=${this.token}`
     );
     const parsed = await response.json();
     return parsed.results[0];
@@ -159,8 +176,7 @@ class Quiz {
         {
           question: Buffer.from("Next round starting soon").toString("base64"),
         },
-        this.roundBreak,
-        this.getQuizState()
+        this.roundBreak
       );
       this.timeout = setTimeout(() => this.askNextQuestion(), this.roundBreak);
     } else {
@@ -173,17 +189,11 @@ class Quiz {
     clearTimeout(this.timeout);
     this.questionsRemaining = 0;
     this.roundsRemaining = 0;
-    await this.sendQuestion(
-      {
-        question: Buffer.from("Quiz Finished").toString("base64"),
-      },
-      0,
-      this.getQuizState()
-    );
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
       socket.removeAllListeners("respondToQuestion");
     }
+    this.io.to(this.room).emit("quizCompleted", this.getQuizState());
   }
 }
 

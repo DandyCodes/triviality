@@ -44,7 +44,7 @@ const Home = () => {
             <br></br>
             <input type="submit"></input>
           </form>
-          <button onClick={ioClient.createLobby}>Create Lobby.</button>
+          <button onClick={ioClient.createLobby}>Create Lobby</button>
         </Fragment>
       ) : (
         <h1>Log in to create or join a quiz</h1>

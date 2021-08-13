@@ -3,10 +3,10 @@ import ioClient from "../controllers/io-client";
 
 const Controls = () => {
   const [formState, setFormState] = useState({
-    questions: 5,
+    questions: 3,
     rounds: 2,
-    timeLimit: 15,
-    roundBreak: 15,
+    timeLimit: 20,
+    roundBreak: 10,
     clickedStart: false,
   });
   const handleChange = event => {
@@ -30,7 +30,7 @@ const Controls = () => {
         id="questions"
         name="questions"
         min="1"
-        max="40"
+        max="100"
         value={formState.questions}
         onChange={handleChange}
       />
@@ -42,7 +42,7 @@ const Controls = () => {
         id="rounds"
         name="rounds"
         min="1"
-        max="5"
+        max="10"
         value={formState.rounds}
         onChange={handleChange}
       />
@@ -53,8 +53,8 @@ const Controls = () => {
         type="number"
         id="timeLimit"
         name="timeLimit"
-        min="10"
-        max="45"
+        min="15"
+        max="60"
         value={formState.timeLimit}
         onChange={handleChange}
       />
@@ -66,7 +66,7 @@ const Controls = () => {
         id="roundBreak"
         name="roundBreak"
         min="1"
-        max="600"
+        max="1000"
         value={formState.roundBreak}
         onChange={handleChange}
       />
