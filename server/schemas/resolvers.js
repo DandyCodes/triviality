@@ -1,8 +1,6 @@
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/server-auth");
 const { User } = require("../models");
-const ioServer = require("../controllers/io-server");
-const Quiz = require("../controllers/quiz");
 
 const resolvers = {
   Query: {
@@ -40,13 +38,6 @@ const resolvers = {
       }
       const token = signToken(user);
       return { token, user };
-    },
-
-    deleteUser: async (_, __, context) => {
-      if (!context.user) {
-        throw new AuthenticationError("Must be logged in");
-      }
-      return User.findOneAndDelete({ _id: context.user._id });
     },
   },
 };
