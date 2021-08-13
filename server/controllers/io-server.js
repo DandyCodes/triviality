@@ -25,29 +25,34 @@ const ioServer = {
           await this.putSocketInRoom(socket, lobby);
         });
 
-        socket.on("startQuiz", async ({ questions, rounds, lobby }) => {
-          const quizRoom = this.generateUniqueRoom(this.quizIDLength);
-          const sockets = this.getSockets(lobby);
-          const nicknames = this.getUniqueNicknames(sockets);
-          const participants = nicknames.map(nickname => ({
-            nickname,
-            score: 0,
-            hasResponded: false,
-          }));
-          const quiz = new Quiz(
-            this.io,
-            sockets,
-            participants,
-            quizRoom,
-            questions,
-            rounds
-          );
-          for (const socket of sockets) {
-            await this.putSocketInRoom(socket, quizRoom);
-            await socket.emit("quizJoined", quiz.getQuizState());
+        socket.on(
+          "startQuiz",
+          async ({ questions, rounds, timeLimit, roundBreak, lobby }) => {
+            const quizRoom = this.generateUniqueRoom(this.quizIDLength);
+            const sockets = this.getSockets(lobby);
+            const nicknames = this.getUniqueNicknames(sockets);
+            const participants = nicknames.map(nickname => ({
+              nickname,
+              score: 0,
+              hasResponded: false,
+            }));
+            const quiz = new Quiz(
+              this.io,
+              sockets,
+              participants,
+              quizRoom,
+              questions,
+              rounds,
+              timeLimit,
+              roundBreak
+            );
+            for (const socket of sockets) {
+              await this.putSocketInRoom(socket, quizRoom);
+              await socket.emit("quizJoined", quiz.getQuizState());
+            }
+            quiz.start();
           }
-          quiz.start();
-        });
+        );
 
         socket.on("disconnecting", async () => {
           await this.leaveAllRoomsAndNotify(socket);

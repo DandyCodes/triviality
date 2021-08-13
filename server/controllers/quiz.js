@@ -1,28 +1,42 @@
 const fetch = require("node-fetch");
 
 class Quiz {
-  participants = [];
-  room = "";
-  questions = "";
-  rounds = "";
   io = null;
   sockets = [];
+  participants = [];
+  room = "";
+  __startingQuestions__ = "";
+  __startingRounds__ = "";
+  questionsRemaining = "";
+  roundsRemaining = "";
   questionHasBeenAnswered = false;
   correctReward = 10;
   incorrectPunishment = 5;
-  __startingQuestions__ = "";
   timeout = null;
   timeLimit = 1000 * 15;
   pause = 1000 * 2;
+  roundBreak = 1000 * 15;
 
-  constructor(io, sockets, participants, room, questions, rounds) {
+  constructor(
+    io,
+    sockets,
+    participants,
+    room,
+    questions,
+    rounds,
+    timeLimit,
+    roundBreak
+  ) {
     this.io = io;
     this.sockets = sockets;
     this.participants = participants;
     this.room = room;
-    this.questions = questions;
-    this.rounds = rounds;
-    this.__startingQuestions__ = questions;
+    this.__startingQuestions__ = parseInt(questions);
+    this.__startingRounds__ = parseInt(rounds);
+    this.questionsRemaining = this.__startingQuestions__;
+    this.roundsRemaining = this.__startingRounds__;
+    this.timeLimit = parseInt(timeLimit) * 1000;
+    this.roundBreak = parseInt(roundBreak) * 1000;
   }
 
   async start() {
@@ -59,13 +73,14 @@ class Quiz {
       );
     }
     await this.io.to(this.room).emit("updateQuiz", this.getQuizState());
-    this.askNextQuestion();
+    this.nextRound();
   }
 
   async askNextQuestion() {
-    this.questions--;
-    if (this.questions < 0) {
-      if (this.rounds > 0) {
+    this.questionsRemaining--;
+    if (this.questionsRemaining < 0) {
+      if (this.roundsRemaining > 0) {
+        this.questionsRemaining = this.__startingQuestions__;
         return this.nextRound();
       } else {
         return this.endQuiz();
@@ -79,12 +94,16 @@ class Quiz {
     for (const participant of this.participants) {
       participant.hasResponded = false;
     }
-    await this.io.to(this.room).emit("askQuestion", {
-      quizState: this.getQuizState(),
-      question,
-      timeLimit: this.timeLimit,
-    });
+    await this.sendQuestion(question, this.timeLimit, this.getQuizState());
     this.timeout = setTimeout(() => this.askNextQuestion(), this.timeLimit);
+  }
+
+  async sendQuestion(question, timeLimit, quizState) {
+    await this.io.to(this.room).emit("askQuestion", {
+      question,
+      timeLimit,
+      quizState,
+    });
   }
 
   handleResponse(nickname, question, response) {
@@ -108,6 +127,7 @@ class Quiz {
         }
       }
       if (allResponded) {
+        clearTimeout(this.timeout);
         setTimeout(() => this.askNextQuestion(), this.pause);
       }
     }
@@ -117,8 +137,8 @@ class Quiz {
   getQuizState() {
     return {
       participants: this.participants,
-      questions: this.questions,
-      rounds: this.rounds,
+      questions: this.questionsRemaining,
+      rounds: this.roundsRemaining,
       room: this.room,
       questionHasBeenAnswered: this.questionHasBeenAnswered,
     };
@@ -132,9 +152,34 @@ class Quiz {
     return parsed.results[0];
   }
 
-  nextRound() {}
+  async nextRound() {
+    clearTimeout(this.timeout);
+    if (this.roundsRemaining < this.__startingRounds__) {
+      await this.sendQuestion(
+        {
+          question: Buffer.from("Next round starting soon").toString("base64"),
+        },
+        this.roundBreak,
+        this.getQuizState()
+      );
+      this.timeout = setTimeout(() => this.askNextQuestion(), this.roundBreak);
+    } else {
+      this.timeout = setTimeout(() => this.askNextQuestion(), this.pause);
+    }
+    this.roundsRemaining--;
+  }
 
-  endQuiz() {
+  async endQuiz() {
+    clearTimeout(this.timeout);
+    this.questionsRemaining = 0;
+    this.roundsRemaining = 0;
+    await this.sendQuestion(
+      {
+        question: Buffer.from("Quiz Finished").toString("base64"),
+      },
+      0,
+      this.getQuizState()
+    );
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
       socket.removeAllListeners("respondToQuestion");

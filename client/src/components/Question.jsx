@@ -10,12 +10,16 @@ const Question = ({ hasBeenAnswered }) => {
     setResponded(false);
     setTimeRemaining(parseInt(event.detail.timeLimit * 0.001));
     const encoded = event.detail.question;
-    const decodedOptions = shuffle(
-      encoded.incorrect_answers
-        .map(ans => Buffer.from(ans, "base64").toString())
-        .concat([Buffer.from(encoded.correct_answer, "base64").toString()])
-    );
-    const decodedQuestion = Buffer.from(encoded.question, "base64").toString();
+    const decodedOptions = encoded.correct_answer
+      ? shuffle(
+          encoded.incorrect_answers
+            .map(ans => Buffer.from(ans, "base64").toString())
+            .concat([Buffer.from(encoded.correct_answer, "base64").toString()])
+        )
+      : [];
+    const decodedQuestion = encoded.question
+      ? Buffer.from(encoded.question, "base64").toString()
+      : null;
     setQuestion({
       ...event.detail,
       decodedOptions,
@@ -59,7 +63,9 @@ const Question = ({ hasBeenAnswered }) => {
           )
         )}
       </section>
-      <section>{hasBeenAnswered ? null : timeRemaining}</section>
+      <section>
+        {hasBeenAnswered ? null : <span>Time Remaining: {timeRemaining}</span>}
+      </section>
     </article>
   ) : null;
 };
