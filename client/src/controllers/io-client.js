@@ -74,8 +74,8 @@ const ioClient = {
     return room === this.currentRoom;
   },
 
-  startQuiz(questions, rounds) {
-    socket.emit("startQuiz", { questions, rounds, lobby: this.currentRoom });
+  startQuiz(formState) {
+    socket.emit("startQuiz", { ...formState, lobby: this.currentRoom });
   },
 
   respondToQuestion(question, response) {

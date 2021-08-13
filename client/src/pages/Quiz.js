@@ -28,8 +28,8 @@ const Quiz = () => {
       <h1>Quiz</h1>
       <Question hasBeenAnswered={quizState.questionHasBeenAnswered}></Question>
       <Members members={quizState.participants}></Members>
-      <h3>Questions: {quizState.questions}</h3>
-      <h3>Rounds: {quizState.rounds}</h3>
+      <h3>Questions Remaining: {quizState.questions}</h3>
+      <h3>Rounds Remaining: {quizState.rounds}</h3>
     </main>
   );
 };
