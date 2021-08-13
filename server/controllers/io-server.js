@@ -32,6 +32,7 @@ const ioServer = {
           const participants = nicknames.map(nickname => ({
             nickname,
             score: 0,
+            hasResponded: false,
           }));
           const quiz = new Quiz(
             this.io,
