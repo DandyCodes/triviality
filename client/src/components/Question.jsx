@@ -1,37 +1,42 @@
 import { useEffect, useState } from "react";
-import shuffle from "shuffle-array";
 import ioClient from "../controllers/io-client";
+import { decodeQuestion, encodeToBase64 } from "../utils/helpers";
+import "./styles/Question.css";
 
-const Question = ({ hasBeenAnswered }) => {
+const Question = () => {
   const [question, setQuestion] = useState();
   const [responded, setResponded] = useState(false);
+  const [response, setResponse] = useState(null);
+  const [revealed, setRevealed] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(10);
   const askQuestion = event => {
+    setResponse(null);
+    setRevealed(false);
     setResponded(false);
-    setTimeRemaining(parseInt(event.detail.timeLimit * 0.001));
-    const encoded = event.detail.question;
-    const decodedOptions = encoded.correct_answer
-      ? shuffle(
-          encoded.incorrect_answers
-            .map(ans => Buffer.from(ans, "base64").toString())
-            .concat([Buffer.from(encoded.correct_answer, "base64").toString()])
-        )
-      : [];
-    const decodedQuestion = encoded.question
-      ? Buffer.from(encoded.question, "base64").toString()
-      : null;
+    const questionObject = event.detail;
+    const difference = Date.now() - questionObject.timeStamp;
+    setTimeRemaining(parseInt((questionObject.timeLimit - difference) * 0.001));
+    const { decodedOptions, decodedQuestion } = decodeQuestion(questionObject);
     setQuestion({
-      ...event.detail,
+      ...questionObject,
       decodedOptions,
       decodedQuestion,
     });
   };
   const respondToQuestion = decodedResponse => {
+    setResponse(decodedResponse);
     setResponded(true);
-    ioClient.respondToQuestion(
-      question,
-      Buffer.from(decodedResponse).toString("base64")
-    );
+    ioClient.respondToQuestion(question, encodeToBase64(decodedResponse));
+  };
+  const revealAnswer = event => {
+    const questionObject = event.detail;
+    setTimeRemaining(0);
+    setQuestion({
+      ...questionObject,
+      decodedOptions: question.decodedOptions,
+      decodedQuestion: question.decodedQuestion,
+    });
+    setRevealed(true);
   };
   useEffect(() => {
     const timeOut = setTimeout(
@@ -39,9 +44,11 @@ const Question = ({ hasBeenAnswered }) => {
       1000
     );
     window.addEventListener("askQuestion", askQuestion);
+    window.addEventListener("revealAnswer", revealAnswer);
     return () => {
       clearTimeout(timeOut);
       window.removeEventListener("askQuestion", askQuestion);
+      window.removeEventListener("revealAnswer", revealAnswer);
     };
   });
   return question ? (
@@ -49,7 +56,21 @@ const Question = ({ hasBeenAnswered }) => {
       <section>{question.decodedQuestion}</section>
       <section>
         {question.decodedOptions.map((decodedOption, index) =>
-          responded || hasBeenAnswered ? (
+          revealed ? (
+            <button
+              key={index}
+              disabled
+              className={
+                encodeToBase64(decodedOption) === question.correct_answer
+                  ? "correct"
+                  : response === decodedOption
+                  ? "incorrect"
+                  : ""
+              }
+            >
+              {decodedOption}
+            </button>
+          ) : responded ? (
             <button key={index} disabled>
               {decodedOption}
             </button>
@@ -63,9 +84,7 @@ const Question = ({ hasBeenAnswered }) => {
           )
         )}
       </section>
-      <section>
-        {hasBeenAnswered ? null : <span>Time Remaining: {timeRemaining}</span>}
-      </section>
+      <section>{<span>Time Remaining: {timeRemaining}</span>}</section>
     </article>
   ) : null;
 };

@@ -35,6 +35,7 @@ const ioServer = {
               nickname,
               score: 0,
               hasResponded: false,
+              correct: false,
             }));
             const quiz = new Quiz(
               this.io,
@@ -50,6 +51,7 @@ const ioServer = {
               await this.putSocketInRoom(socket, quizRoom);
               await socket.emit("quizJoined", quiz.getQuizState());
             }
+            await delay(100);
             quiz.start();
           }
         );
@@ -66,7 +68,7 @@ const ioServer = {
   async putSocketInRoom(socket, room) {
     await this.leaveAllRoomsAndNotify(socket);
     await socket.join(room);
-    await delay(250);
+    await delay(100);
     if (room.length === this.lobbyIDLength) {
       const lobby = room;
       await socket.emit("lobbyJoined", this.getLobbyState(lobby));

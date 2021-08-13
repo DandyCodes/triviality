@@ -43,20 +43,34 @@ socket.on("confirmReadyToStartQuiz", () => {
   socket.emit("readyToStartQuiz");
 });
 
-socket.on("updateQuiz", quizState => {
+socket.on("updateQuiz", async quizState => {
   const updateQuizEvent = new CustomEvent("updateQuiz", { detail: quizState });
   window.dispatchEvent(updateQuizEvent);
 });
 
-socket.on("askQuestion", ({ quizState, question, timeLimit, timeStamp }) => {
+socket.on("askQuestion", ({ quizState, question }) => {
   const askQuestionEvent = new CustomEvent("askQuestion", {
-    detail: { question, timeLimit, timeStamp },
+    detail: question,
   });
   window.dispatchEvent(askQuestionEvent);
   const updateQuizEvent = new CustomEvent("updateQuiz", {
     detail: quizState,
   });
   window.dispatchEvent(updateQuizEvent);
+});
+
+socket.on("revealAnswer", question => {
+  const revealAnswerEvent = new CustomEvent("revealAnswer", {
+    detail: question,
+  });
+  window.dispatchEvent(revealAnswerEvent);
+});
+
+socket.on("quizCompleted", quizState => {
+  const quizCompletedEvent = new CustomEvent("quizCompleted", {
+    detail: quizState,
+  });
+  window.dispatchEvent(quizCompletedEvent);
 });
 
 const ioClient = {
