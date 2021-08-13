@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const profanityFilter = require("../utils/profanity-filter");
 
 const userSchema = new mongoose.Schema({
   nickname: {
@@ -7,6 +8,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
+    minlength: 2,
+    maxlength: 20,
+    validate: {
+      validator: function (value) {
+        return !profanityFilter.isProfane(value);
+      },
+    },
   },
   email: {
     type: String,
