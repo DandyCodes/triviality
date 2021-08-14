@@ -30,6 +30,13 @@
       rel="stylesheet"
     />
     <title>Triviality</title>
+    <script defer>
+      if ("serviceWorker" in navigator) {
+        window.onload = () => {
+          navigator.serviceWorker.register("service-worker.js");
+        };
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
