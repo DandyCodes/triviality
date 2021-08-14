@@ -8,8 +8,7 @@ const STATIC_FILEPATHS = [
   "/robots.txt",
   "/service-worker.js",
 ];
-const STATIC_CACHE_KEY = "static-cache-v1";
-const RUNTIME_CACHE_KEY = "runtime-cache-v1";
+const STATIC_CACHE_KEY = "static-cache-v2";
 
 self.oninstall = event => event.waitUntil(install());
 self.onactivate = event => event.waitUntil(activate());
@@ -39,7 +38,7 @@ async function activate() {
   try {
     const keyList = await caches.keys();
     for (const key of keyList) {
-      if (key !== STATIC_CACHE_KEY && key !== RUNTIME_CACHE_KEY) {
+      if (key !== STATIC_CACHE_KEY) {
         await caches.delete(key);
       }
     }
