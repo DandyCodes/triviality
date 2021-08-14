@@ -93,6 +93,7 @@ class Quiz {
   async askNextQuestion() {
     for (const participant of this.participants) {
       participant.hasResponded = false;
+      responder.hasPassed = false;
       participant.correct = false;
     }
     this.questionsRemaining--;
@@ -118,7 +119,6 @@ class Quiz {
 
   async sendQuestion(question, timeLimit) {
     question.timeLimit = timeLimit;
-    question.timeStamp = Date.now();
     await this.io.to(this.room).emit("askQuestion", {
       question,
       quizState: this.getQuizState(),

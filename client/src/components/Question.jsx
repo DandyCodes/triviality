@@ -14,8 +14,7 @@ const Question = () => {
     setRevealed(false);
     setResponded(false);
     const questionObject = event.detail;
-    const difference = Date.now() - questionObject.timeStamp;
-    setTimeRemaining(parseInt((questionObject.timeLimit - difference) * 0.001));
+    setTimeRemaining(parseInt(questionObject.timeLimit * 0.001) - 1);
     const { decodedOptions, decodedQuestion } = decodeQuestion(questionObject);
     setQuestion({
       ...questionObject,
