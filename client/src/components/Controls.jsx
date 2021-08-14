@@ -34,19 +34,19 @@ const Controls = ({ multiplayer }) => {
             placeholder="Game Mode"
             id="gameMode"
             name="gameMode"
-            value={formState.gameMode}
+            value={formState.gameMode ? formState.gameMode : "fastest"}
             onChange={handleChange}
           >
             <option value="everyone">Everyone Can Answer</option>
             <option value="fastest">Fastest Finger First</option>
           </select>
-          {formState.gameMode === "fastest" ? (
-            <div>Points are awarded for the fastest correct answer only</div>
-          ) : formState.gameMode === "everyone" ? (
+          {formState.gameMode === "everyone" ? (
             <div>
               Points are rewarded for every correct answer, not just the fastest
             </div>
-          ) : null}
+          ) : (
+            <div>Points are awarded for the fastest correct answer only</div>
+          )}
           <br />
         </Fragment>
       ) : null}
