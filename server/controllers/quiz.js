@@ -18,6 +18,7 @@ class Quiz {
   pause = 1000 * 4;
   roundBreak = 1000 * 10;
   token = "";
+  gameMode = "fastest";
 
   constructor(
     io,
@@ -27,7 +28,8 @@ class Quiz {
     questions,
     rounds,
     timeLimit,
-    roundBreak
+    roundBreak,
+    gameMode
   ) {
     this.io = io;
     this.sockets = sockets;
@@ -39,6 +41,7 @@ class Quiz {
     this.roundsRemaining = this.__startingRounds__;
     this.timeLimit = parseInt(timeLimit) * 1000;
     this.roundBreak = parseInt(roundBreak) * 1000;
+    this.gameMode = gameMode;
   }
 
   async start() {
@@ -76,7 +79,7 @@ class Quiz {
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
       socket.on("respondToQuestion", ({ question, response }) => {
-        if (this.questionHasBeenAnswered) return;
+        if (this.questionHasBeenAnswered && this.gameMode === "fastest") return;
         if (
           response === "cGFzc1RoaXNJc05vdEFSZWFsUG9zc2libGVBbnN3ZXJ6enFmcA=="
         ) {
@@ -93,7 +96,7 @@ class Quiz {
   async askNextQuestion() {
     for (const participant of this.participants) {
       participant.hasResponded = false;
-      responder.hasPassed = false;
+      participant.hasPassed = false;
       participant.correct = false;
     }
     this.questionsRemaining--;
@@ -159,7 +162,9 @@ class Quiz {
       responder.correct = true;
       this.questionHasBeenAnswered = true;
       responder.score += this.correctReward;
-      this.revealAnswer(question);
+      if (this.gameMode === "fastest") {
+        this.revealAnswer(question);
+      }
     } else {
       responder.correct = false;
       responder.score -= this.incorrectPunishment;
@@ -182,7 +187,6 @@ class Quiz {
       questions: this.questionsRemaining,
       rounds: this.roundsRemaining,
       room: this.room,
-      questionHasBeenAnswered: this.questionHasBeenAnswered,
     };
   }
 

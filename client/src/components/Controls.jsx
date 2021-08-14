@@ -7,6 +7,7 @@ const Controls = () => {
     rounds: 3,
     timeLimit: 20,
     roundBreak: 10,
+    gameMode: "fastest",
     clickedStart: false,
   });
   const handleChange = event => {
@@ -22,6 +23,19 @@ const Controls = () => {
   };
   return (
     <section>
+      <label htmlFor="questions" className="minor-heading">
+        Game Mode:
+      </label>
+      <select
+        placeholder="Game Mode"
+        id="gameMode"
+        name="gameMode"
+        value={formState.gameMode}
+        onChange={handleChange}
+      >
+        <option value="everyone">Everyone Can Answer</option>
+        <option value="fastest">Fastest Finger First</option>
+      </select>
       <label htmlFor="questions" className="minor-heading">
         Questions Per Round:
       </label>

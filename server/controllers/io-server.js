@@ -27,7 +27,14 @@ const ioServer = {
 
         socket.on(
           "startQuiz",
-          async ({ questions, rounds, timeLimit, roundBreak, lobby }) => {
+          async ({
+            questions,
+            rounds,
+            timeLimit,
+            roundBreak,
+            lobby,
+            gameMode,
+          }) => {
             const quizRoom = this.generateUniqueRoom(this.quizIDLength);
             const sockets = this.getSockets(lobby);
             const nicknames = this.getUniqueNicknames(sockets);
@@ -46,7 +53,8 @@ const ioServer = {
               questions,
               rounds,
               timeLimit,
-              roundBreak
+              roundBreak,
+              gameMode
             );
             for (const socket of sockets) {
               await this.putSocketInRoom(socket, quizRoom);
