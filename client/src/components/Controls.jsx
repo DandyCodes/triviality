@@ -8,7 +8,7 @@ const Controls = ({ multiplayer }) => {
     rounds: 3,
     timeLimit: 20,
     roundBreak: 10,
-    gameMode: "fastest",
+    gameMode: "",
     clickedStart: false,
   });
   const handleChange = event => {

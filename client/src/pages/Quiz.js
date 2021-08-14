@@ -57,11 +57,13 @@ const Quiz = () => {
           <div>Rounds Remaining: {quizState.rounds}</div>
           {quizState.gameMode ? (
             quizState.gameMode === "fastest" ? (
-              <div className="game-mode-display">{"Fastest Finger First"}</div>
+              <div className="game-mode-display">Fastest Finger First</div>
             ) : quizState.gameMode === "everyone" ? (
-              <div className="game-mode-display">{"Everyone Can Answer"}</div>
+              <div className="game-mode-display">Everyone Can Answer</div>
             ) : null
-          ) : null}
+          ) : (
+            <div className="game-mode-display">Solo Play</div>
+          )}
         </section>
       </article>
     </main>
