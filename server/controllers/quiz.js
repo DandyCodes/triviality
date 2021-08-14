@@ -18,7 +18,7 @@ class Quiz {
   pause = 1000 * 4;
   roundBreak = 1000 * 10;
   token = "";
-  gameMode = "fastest";
+  gameMode = "";
 
   constructor(
     io,
@@ -193,6 +193,7 @@ class Quiz {
       questions: this.questionsRemaining,
       rounds: this.roundsRemaining,
       room: this.room,
+      gameMode: this.gameMode,
     };
   }
 

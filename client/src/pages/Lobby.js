@@ -39,7 +39,10 @@ const Lobby = () => {
           </div>
         </section>
         {lobbyState.isCreator ? (
-          <Controls room={room}></Controls>
+          <Controls
+            multiplayer={lobbyState.nicknames.length > 1}
+            room={room}
+          ></Controls>
         ) : (
           <section>
             <div>Waiting...</div>

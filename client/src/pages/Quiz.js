@@ -13,6 +13,7 @@ const Quiz = () => {
     participants: [],
     questions: "",
     rounds: "",
+    gameMode: "",
   });
   const [finished, setFinished] = useState(false);
   const updateQuiz = event => {
@@ -54,6 +55,13 @@ const Quiz = () => {
         <section>
           <div>Questions Remaining: {quizState.questions}</div>
           <div>Rounds Remaining: {quizState.rounds}</div>
+          {quizState.gameMode ? (
+            quizState.gameMode === "fastest" ? (
+              <div className="game-mode-display">{"Fastest Finger First"}</div>
+            ) : quizState.gameMode === "everyone" ? (
+              <div className="game-mode-display">{"Everyone Can Answer"}</div>
+            ) : null
+          ) : null}
         </section>
       </article>
     </main>

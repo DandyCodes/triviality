@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import ioClient from "../controllers/io-client";
+import "./styles/Controls.css";
 
-const Controls = () => {
+const Controls = ({ multiplayer }) => {
   const [formState, setFormState] = useState({
     questions: 7,
     rounds: 3,
@@ -23,19 +24,32 @@ const Controls = () => {
   };
   return (
     <section>
-      <label htmlFor="gameMode" className="minor-heading">
-        Game Mode:
-      </label>
-      <select
-        placeholder="Game Mode"
-        id="gameMode"
-        name="gameMode"
-        value={formState.gameMode}
-        onChange={handleChange}
-      >
-        <option value="everyone">Everyone Can Answer</option>
-        <option value="fastest">Fastest Finger First</option>
-      </select>
+      {multiplayer ? (
+        <Fragment>
+          <label htmlFor="gameMode" className="minor-heading">
+            Game Mode:
+          </label>
+          <select
+            className="game-mode-select"
+            placeholder="Game Mode"
+            id="gameMode"
+            name="gameMode"
+            value={formState.gameMode}
+            onChange={handleChange}
+          >
+            <option value="everyone">Everyone Can Answer</option>
+            <option value="fastest">Fastest Finger First</option>
+          </select>
+          {formState.gameMode === "fastest" ? (
+            <div>Points are awarded for the fastest correct answer only</div>
+          ) : formState.gameMode === "everyone" ? (
+            <div>
+              Points are rewarded for every correct answer, not just the fastest
+            </div>
+          ) : null}
+          <br />
+        </Fragment>
+      ) : null}
       <label htmlFor="questions" className="minor-heading">
         Questions Per Round:
       </label>
