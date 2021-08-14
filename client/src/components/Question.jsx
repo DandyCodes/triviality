@@ -29,7 +29,6 @@ const Question = () => {
   };
   const revealAnswer = event => {
     const questionObject = event.detail;
-    setTimeRemaining(0);
     setQuestion({
       ...questionObject,
       decodedOptions: question.decodedOptions,
@@ -99,14 +98,8 @@ const Question = () => {
         <div>{<span>Time Remaining: {timeRemaining}</span>}</div>
       </section>
       {question.decodedQuestion ===
-      "Next round starting soon" ? null : response ===
-        "passThisIsNotARealPossibleAnswerzzqfp" ? (
-        <button
-          className="option responded"
-          onClick={() =>
-            respondToQuestion("passThisIsNotARealPossibleAnswerzzqfp")
-          }
-        >
+      "Next round starting soon" ? null : responded || revealed ? (
+        <button disabled className="option responded">
           PASS
         </button>
       ) : (

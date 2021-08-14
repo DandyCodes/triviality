@@ -86,6 +86,7 @@ class Quiz {
           this.handlePass(socket.nickname, question);
         } else {
           this.handleResponse(socket.nickname, question, response);
+          this.io.to(socket.id).emit("revealAnswer", question);
         }
       });
     }
@@ -143,6 +144,7 @@ class Quiz {
     let allResponded = true;
     for (const participant of this.participants) {
       if (!participant.hasResponded) {
+        console.log("go");
         allResponded = false;
       }
     }
@@ -157,6 +159,7 @@ class Quiz {
       participant => participant.nickname === nickname
     );
     responder.hasResponded = true;
+    let revealed = false;
     const correct = question.correct_answer === response;
     if (correct) {
       responder.correct = true;
@@ -164,10 +167,13 @@ class Quiz {
       responder.score += this.correctReward;
       if (this.gameMode === "fastest") {
         this.revealAnswer(question);
+        revealed = true;
       }
     } else {
       responder.correct = false;
       responder.score -= this.incorrectPunishment;
+    }
+    if (!revealed) {
       let allResponded = true;
       for (const participant of this.participants) {
         if (!participant.hasResponded) {

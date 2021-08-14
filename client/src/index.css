@@ -110,7 +110,8 @@ button:active {
   color: var(--success);
 }
 
-input {
+input,
+select {
   font-size: 1.25rem;
   padding: 0.2rem;
   margin: 0.5rem;

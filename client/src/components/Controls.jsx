@@ -23,7 +23,7 @@ const Controls = () => {
   };
   return (
     <section>
-      <label htmlFor="questions" className="minor-heading">
+      <label htmlFor="gameMode" className="minor-heading">
         Game Mode:
       </label>
       <select

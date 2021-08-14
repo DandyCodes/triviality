@@ -23,6 +23,7 @@ const Quiz = () => {
     setQuizState(finalQuizState);
     setFinished(true);
   };
+
   useEffect(() => {
     window.addEventListener("updateQuiz", updateQuiz);
     window.addEventListener("quizCompleted", completeQuiz);

@@ -16,7 +16,7 @@ const Home = () => {
     });
   };
   const onJoinLobbyClicked = () => {
-    return ioClient.joinLobby(formState.lobby);
+    return ioClient.joinLobby(formState.lobby.toUpperCase());
   };
   const onLobbyJoined = event => {
     history.push(`/lobby/${event.detail.lobby}`);
