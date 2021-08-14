@@ -163,15 +163,15 @@ class Quiz {
     } else {
       responder.correct = false;
       responder.score -= this.incorrectPunishment;
-    }
-    let allResponded = true;
-    for (const participant of this.participants) {
-      if (!participant.hasResponded) {
-        allResponded = false;
+      let allResponded = true;
+      for (const participant of this.participants) {
+        if (!participant.hasResponded) {
+          allResponded = false;
+        }
       }
-    }
-    if (allResponded) {
-      this.revealAnswer(question);
+      if (allResponded) {
+        this.revealAnswer(question);
+      }
     }
     this.io.to(this.room).emit("updateQuiz", this.getQuizState());
   }
