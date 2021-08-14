@@ -20,7 +20,7 @@ const Members = ({ members }) => {
           <span>{member.nickname}</span>
           {member.score !== undefined ? (
             <Fragment>
-              <span> : </span> <span>{member.score}</span>
+              <span> : </span> <span>{member.score} </span>
             </Fragment>
           ) : null}
         </div>

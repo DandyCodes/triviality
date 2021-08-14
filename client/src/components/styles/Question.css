@@ -10,6 +10,17 @@
   background-color: var(--danger);
 }
 
+.option.incorrect::after {
+  color: black;
+  content: " - 7";
+  font-weight: bolder;
+}
+.option.celebrate::after {
+  color: white;
+  content: " + 10";
+  font-weight: bolder;
+}
+
 .option.selected {
   background-color: var(--warning);
 }

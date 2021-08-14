@@ -3,8 +3,8 @@ import ioClient from "../controllers/io-client";
 
 const Controls = () => {
   const [formState, setFormState] = useState({
-    questions: 3,
-    rounds: 2,
+    questions: 7,
+    rounds: 3,
     timeLimit: 20,
     roundBreak: 10,
     clickedStart: false,

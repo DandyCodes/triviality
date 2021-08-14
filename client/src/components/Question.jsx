@@ -63,7 +63,10 @@ const Question = () => {
               key={index}
               disabled
               className={
-                encodeToBase64(decodedOption) === question.correct_answer
+                encodeToBase64(decodedOption) === question.correct_answer &&
+                response === decodedOption
+                  ? "option correct celebrate"
+                  : encodeToBase64(decodedOption) === question.correct_answer
                   ? "option correct"
                   : response === decodedOption
                   ? "option incorrect"

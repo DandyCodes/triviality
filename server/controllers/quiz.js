@@ -12,11 +12,11 @@ class Quiz {
   roundsRemaining = "";
   questionHasBeenAnswered = false;
   correctReward = 10;
-  incorrectPunishment = 5;
+  incorrectPunishment = 7;
   timeout = null;
-  timeLimit = 1000 * 15;
-  pause = 1000 * 2;
-  roundBreak = 1000 * 15;
+  timeLimit = 1000 * 20;
+  pause = 1000 * 4;
+  roundBreak = 1000 * 10;
   token = "";
 
   constructor(
