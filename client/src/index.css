@@ -95,10 +95,6 @@ button {
   margin-top: 0.2rem;
 }
 
-button:hover {
-  background-color: var(--light);
-}
-
 button:active {
   top: 0.1rem;
   background-color: var(--active-light);
@@ -127,4 +123,10 @@ input.number {
   width: 100%;
   max-width: 30rem;
   cursor: pointer;
+}
+
+@media (hover: hover) {
+  button:hover {
+    background-color: var(--light);
+  }
 }
