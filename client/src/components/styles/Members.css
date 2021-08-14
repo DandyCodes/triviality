@@ -20,14 +20,14 @@
 }
 
 .member.incorrect::after {
-  content: "  - 7 ";
+  content: " - 7 ";
   background-color: var(--danger);
   color: black;
   border-radius: 0.3rem;
 }
 
 .member.correct::after {
-  content: "  + 10 ";
+  content: " + 10 ";
   background-color: var(--success);
   border-radius: 0.3rem;
   color: white;
