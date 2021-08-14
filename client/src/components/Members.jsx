@@ -13,6 +13,8 @@ const Members = ({ members }) => {
               : member.hasResponded
               ? member.correct
                 ? "subheading correct member"
+                : member.hasPassed
+                ? "subheading passed member"
                 : "subheading incorrect member"
               : "subheading member"
           }

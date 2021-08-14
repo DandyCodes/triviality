@@ -35,6 +35,7 @@ const ioServer = {
               nickname,
               score: 0,
               hasResponded: false,
+              hasPassed: false,
               correct: false,
             }));
             const quiz = new Quiz(

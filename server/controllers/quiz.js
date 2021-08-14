@@ -75,9 +75,16 @@ class Quiz {
   async beginQuiz() {
     for (const socket of this.sockets) {
       socket.removeAllListeners("readyToStartQuiz");
-      socket.on("respondToQuestion", ({ question, response }) =>
-        this.handleResponse(socket.nickname, question, response)
-      );
+      socket.on("respondToQuestion", ({ question, response }) => {
+        if (this.questionHasBeenAnswered) return;
+        if (
+          response === "cGFzc1RoaXNJc05vdEFSZWFsUG9zc2libGVBbnN3ZXJ6enFmcA=="
+        ) {
+          this.handlePass(socket.nickname, question);
+        } else {
+          this.handleResponse(socket.nickname, question, response);
+        }
+      });
     }
     await this.io.to(this.room).emit("updateQuiz", this.getQuizState());
     this.nextRound();
@@ -124,8 +131,25 @@ class Quiz {
     setTimeout(() => this.askNextQuestion(), this.pause);
   }
 
+  handlePass(nickname, question) {
+    const responder = this.participants.find(
+      participant => participant.nickname === nickname
+    );
+    responder.hasResponded = true;
+    responder.hasPassed = true;
+    let allResponded = true;
+    for (const participant of this.participants) {
+      if (!participant.hasResponded) {
+        allResponded = false;
+      }
+    }
+    if (allResponded) {
+      this.revealAnswer(question);
+    }
+    this.io.to(this.room).emit("updateQuiz", this.getQuizState());
+  }
+
   handleResponse(nickname, question, response) {
-    if (this.questionHasBeenAnswered) return;
     const responder = this.participants.find(
       participant => participant.nickname === nickname
     );
@@ -139,15 +163,15 @@ class Quiz {
     } else {
       responder.correct = false;
       responder.score -= this.incorrectPunishment;
-      let allResponded = true;
-      for (const participant of this.participants) {
-        if (!participant.hasResponded) {
-          allResponded = false;
-        }
+    }
+    let allResponded = true;
+    for (const participant of this.participants) {
+      if (!participant.hasResponded) {
+        allResponded = false;
       }
-      if (allResponded) {
-        this.revealAnswer(question);
-      }
+    }
+    if (allResponded) {
+      this.revealAnswer(question);
     }
     this.io.to(this.room).emit("updateQuiz", this.getQuizState());
   }

@@ -99,6 +99,26 @@ const Question = () => {
       <section>
         <div>{<span>Time Remaining: {timeRemaining}</span>}</div>
       </section>
+      {question.decodedQuestion ===
+      "Next round starting soon" ? null : response ===
+        "passThisIsNotARealPossibleAnswerzzqfp" ? (
+        <button
+          className="option responded"
+          onClick={() =>
+            respondToQuestion("passThisIsNotARealPossibleAnswerzzqfp")
+          }
+        >
+          PASS
+        </button>
+      ) : (
+        <button
+          onClick={() =>
+            respondToQuestion("passThisIsNotARealPossibleAnswerzzqfp")
+          }
+        >
+          PASS
+        </button>
+      )}
     </Fragment>
   ) : null;
 };
