@@ -1,0 +1,7 @@
+#delete {
+  color: var(--danger);
+}
+
+#edit {
+  color: var(--warning);
+}

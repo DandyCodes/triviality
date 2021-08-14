@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { LOGIN } from "../utils/mutations";
@@ -14,8 +14,7 @@ const Login = () => {
       [name]: value,
     });
   };
-  const handleFormSubmit = async event => {
-    event.preventDefault();
+  const handleFormSubmit = async () => {
     try {
       const { data } = await login({
         variables: { ...formState },
@@ -31,32 +30,43 @@ const Login = () => {
   };
   return (
     <main>
-      <h4>Login</h4>
-      {data ? (
-        <Fragment>
-          <h1>Success</h1>
-          <Link to="/">back to home</Link>
-        </Fragment>
-      ) : (
-        <form onSubmit={handleFormSubmit}>
-          <input
-            placeholder="Email"
-            name="email"
-            type="email"
-            value={formState.email}
-            onChange={handleChange}
-          />
-          <input
-            placeholder="******"
-            name="password"
-            type="password"
-            value={formState.password}
-            onChange={handleChange}
-          />
-          <input type="submit" />
-        </form>
-      )}
-      {error && <div>{error.message}</div>}
+      <article>
+        {data ? (
+          <section>
+            <div className="heading">Success</div>
+            <Link to="/">
+              <div className="minor-heading">back to home</div>
+            </Link>
+          </section>
+        ) : (
+          <section>
+            <input
+              placeholder="Email"
+              name="email"
+              type="email"
+              value={formState.email}
+              onChange={handleChange}
+              onKeyDown={e => e.key === "Enter" && handleFormSubmit()}
+            />
+            <input
+              placeholder="******"
+              name="password"
+              type="password"
+              value={formState.password}
+              onChange={handleChange}
+              onKeyDown={e => e.key === "Enter" && handleFormSubmit()}
+            />
+            <button
+              className="heading-button"
+              onClick={handleFormSubmit}
+              type="submit"
+            >
+              LOGIN
+            </button>
+          </section>
+        )}
+        <section>{error && <div>{error.message}</div>}</section>
+      </article>
     </main>
   );
 };

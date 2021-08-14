@@ -1,15 +1,26 @@
 :root {
-  --primary: hsl(210, 46%, 34%);
-  --info: hsl(204, 71%, 50%);
-  --link: hsl(49, 4%, 51%);
-  --success: hsl(85, 51%, 51%);
-  --warning: hsl(21, 89%, 57%);
-  --danger: hsl(2, 65%, 56%);
-  --dark: hsl(72, 4%, 24%);
-  --light: hsl(0, 0%, 100%);
+  --primary: hsl(210, 40%, 60%);
+  --info: hsl(210, 40%, 80%);
+  --link: hsl(150, 40%, 60%);
+  --success: hsl(90, 40%, 60%);
+  --warning: hsl(45, 55%, 65%);
+  --danger: hsl(0, 40%, 60%);
+  --dark: hsl(330, 1%, 12.5%);
+  --light: hsl(45, 20%, 90%);
+  --active-light: hsl(45, 25%, 80%);
+  --shadow: hsl(0, 0%, 35%);
+  --contrast: hsl(330, 2%, 25%);
+  --header-height: 4rem;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 body {
+  color: var(--light);
+  background-color: var(--dark);
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -18,7 +29,103 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+main {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+article {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.heading {
+  font-size: 3.5rem;
+  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  color: var(--primary);
+}
+
+.subheading {
+  font-size: 2rem;
+  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  color: var(--warning);
+}
+
+.minor-heading {
+  font-size: 1.5rem;
+  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  color: var(--light);
+}
+
+button {
+  all: unset;
+  width: 100%;
+  max-width: 30rem;
+  min-height: 4rem;
+  font-size: 1rem;
+  display: block;
+  border-radius: 0.3rem;
+  color: var(--dark);
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 -0.5rem 0 -0.35rem rgba(0, 0, 0, 0.3) inset;
+  margin-top: 0.2rem;
+}
+
+button:hover {
+  background-color: var(--light);
+}
+
+button:active {
+  top: 0.1rem;
+  background-color: var(--active-light);
+}
+
+.heading-button {
+  font-size: 3rem;
+  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  color: var(--success);
+}
+
+input {
+  font-size: 1.25rem;
+  padding: 0.2rem;
+  margin: 0.5rem;
+}
+
+input.number {
+  width: 100%;
+  max-width: 6rem;
+}
+
+.link-button {
+  all: unset;
+  width: 100%;
+  max-width: 30rem;
+  cursor: pointer;
 }

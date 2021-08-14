@@ -23,3 +23,21 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const UPDATE_NICKNAME = gql`
+  mutation updateNickname($nickname: String!) {
+    updateNickname(nickname: $nickname) {
+      _id
+      nickname
+    }
+  }
+`;
+
+export const DELETE_USER = gql`
+  mutation deleteUser {
+    deleteUser {
+      _id
+      nickname
+    }
+  }
+`;

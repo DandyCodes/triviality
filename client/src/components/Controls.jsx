@@ -21,10 +21,12 @@ const Controls = () => {
     ioClient.startQuiz(formState);
   };
   return (
-    <aside>
-      <h2>Controls</h2>
-      <label htmlFor="questions">Questions Per Round: </label>
+    <section>
+      <label htmlFor="questions" className="minor-heading">
+        Questions Per Round:
+      </label>
       <input
+        className="number"
         placeholder="Questions Per Round"
         type="number"
         id="questions"
@@ -34,9 +36,11 @@ const Controls = () => {
         value={formState.questions}
         onChange={handleChange}
       />
-      <br />
-      <label htmlFor="rounds">Rounds: </label>
+      <label htmlFor="rounds" className="minor-heading">
+        Number Of Rounds:
+      </label>
       <input
+        className="number"
         placeholder="Rounds"
         type="number"
         id="rounds"
@@ -46,9 +50,11 @@ const Controls = () => {
         value={formState.rounds}
         onChange={handleChange}
       />
-      <br />
-      <label htmlFor="timeLimit">Question Time Limit: </label>
+      <label htmlFor="timeLimit" className="minor-heading">
+        Question Time Limit:
+      </label>
       <input
+        className="number"
         placeholder="Question Time Limit"
         type="number"
         id="timeLimit"
@@ -58,9 +64,11 @@ const Controls = () => {
         value={formState.timeLimit}
         onChange={handleChange}
       />
-      <br />
-      <label htmlFor="roundBreak">Round Break Time: </label>
+      <label htmlFor="roundBreak" className="minor-heading">
+        Round Break Time:
+      </label>
       <input
+        className="number"
         placeholder="Round Break Time"
         type="number"
         id="roundBreak"
@@ -72,11 +80,15 @@ const Controls = () => {
       />
       <br />
       {formState.clickedStart ? (
-        <button disabled>Starting...</button>
+        <button className="heading-button" disabled>
+          Starting...
+        </button>
       ) : (
-        <button onClick={startQuiz}>StartQuiz</button>
+        <button className="heading-button" onClick={startQuiz}>
+          Start
+        </button>
       )}
-    </aside>
+    </section>
   );
 };
 

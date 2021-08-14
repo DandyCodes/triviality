@@ -6,6 +6,8 @@ const typeDefs = gql`
     nickname: String
     email: String
     password: String
+    won: Int
+    played: Int
   }
 
   type Auth {
@@ -23,6 +25,7 @@ const typeDefs = gql`
     addUser(nickname: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
     deleteUser: User
+    updateNickname(nickname: String!): User
   }
 `;
 

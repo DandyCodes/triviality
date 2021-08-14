@@ -1,7 +1,20 @@
-.correct {
-  background-color: green;
+.option.correct {
+  background-color: var(--success);
 }
 
-.incorrect {
-  background-color: red;
+.option.responded {
+  background-color: grey;
+}
+
+.option.incorrect {
+  background-color: var(--danger);
+}
+
+.option.selected {
+  background-color: var(--warning);
+}
+
+.option.selected:active,
+.option.responded:active {
+  top: 0rem;
 }

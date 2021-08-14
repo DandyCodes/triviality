@@ -1,6 +1,6 @@
 import Members from "./Members";
 
-const Finish = ({ quizState }) => {
+const Scoreboard = ({ quizState }) => {
   const participants = quizState.participants;
   participants.sort((a, b) => b.score - a.score);
   const scores = participants.map(participant => participant.score);
@@ -11,10 +11,15 @@ const Finish = ({ quizState }) => {
     }
   }
   return (
-    <main>
-      <Members members={participants}></Members>
-    </main>
+    <article>
+      <section>
+        <div className="heading">SCORES</div>
+      </section>
+      <section>
+        <Members members={participants}></Members>
+      </section>
+    </article>
   );
 };
 
-export default Finish;
+export default Scoreboard;

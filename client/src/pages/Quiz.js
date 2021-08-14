@@ -4,7 +4,8 @@ import clientAuth from "../utils/client-auth";
 import ioClient from "../controllers/io-client";
 import Members from "../components/Members";
 import Question from "../components/Question";
-import Finish from "../components/Finish";
+import Scoreboard from "../components/Scoreboard";
+import "./styles/Quiz.css";
 
 const Quiz = () => {
   const { room } = useParams();
@@ -33,14 +34,27 @@ const Quiz = () => {
   return !clientAuth.isLoggedIn() || !ioClient.isInRoom(room) ? (
     <Redirect to="/" />
   ) : finished ? (
-    <Finish quizState={quizState}></Finish>
+    <main>
+      <Scoreboard quizState={quizState}></Scoreboard>
+    </main>
   ) : (
     <main>
-      <h1>Quiz</h1>
-      <Question></Question>
-      <Members members={quizState.participants}></Members>
-      <h3>Questions Remaining: {quizState.questions}</h3>
-      <h3>Rounds Remaining: {quizState.rounds}</h3>
+      <article>
+        <Question></Question>
+      </article>
+
+      <article>
+        <section>
+          <div className="minor-heading">PLAYERS</div>
+        </section>
+        <section>
+          <Members members={quizState.participants}></Members>
+        </section>
+        <section>
+          <div>Questions Remaining: {quizState.questions}</div>
+          <div>Rounds Remaining: {quizState.rounds}</div>
+        </section>
+      </article>
     </main>
   );
 };

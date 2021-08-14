@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const { User } = require("../models");
 
 class Quiz {
   io = null;
@@ -194,6 +195,18 @@ class Quiz {
       socket.removeAllListeners("respondToQuestion");
     }
     this.io.to(this.room).emit("quizCompleted", this.getQuizState());
+    const scores = this.participants.map(participant => participant.score);
+    const highestScore = Math.max(...scores);
+    for (const participant of this.participants) {
+      const user = await User.findOne({ nickname: participant.nickname });
+      user.played = user.played ? user.played + 1 : 1;
+      if (this.participants.length > 1) {
+        if (participant.score === highestScore) {
+          user.won = user.won ? user.won + 1 : 1;
+        }
+      }
+      await user.save();
+    }
   }
 }
 

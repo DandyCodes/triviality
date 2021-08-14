@@ -1,12 +1,37 @@
 header {
-  background-color: var(--dark);
+  box-sizing: border-box;
+  background-color: var(--contrast);
+  height: 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 0 0.2rem 0.1rem var(--shadow);
 }
 
-header h1,
-header h2 {
+header img {
+  height: 3.5rem;
+}
+
+header nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 1rem;
+  margin-right: 0.1rem;
+}
+
+header .link {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-decoration: none;
-  color: var(--light);
+  color: var(--info);
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+header .link:hover {
+  color: var(--link);
 }

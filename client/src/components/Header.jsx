@@ -1,7 +1,8 @@
-import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
 import "./styles/Header.css";
+import logo from "../assets/img/triviality-logo.png";
+import { Fragment } from "react";
 
 const Header = () => {
   const logout = () => {
@@ -9,24 +10,26 @@ const Header = () => {
   };
   return (
     <header>
-      <Link to="/">
-        <h1>Triviality</h1>
+      <Link className="link" to="/">
+        <img src={logo} alt="triviality logo" />
       </Link>
       <nav>
         {clientAuth.isLoggedIn() ? (
           <Fragment>
-            <Link to="/me">
-              <h2>View Me</h2>
+            <Link className="link" to="/me">
+              Profile
             </Link>
-            <button onClick={logout}>Logout</button>
+            <span className="link" onClick={logout}>
+              Logout
+            </span>
           </Fragment>
         ) : (
           <Fragment>
-            <Link to="/login">
-              <h2>Login</h2>
+            <Link className="link" to="/login">
+              Login
             </Link>
-            <Link to="/signup">
-              <h2>Signup</h2>
+            <Link className="link" to="/signup">
+              Signup
             </Link>
           </Fragment>
         )}

@@ -1,18 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const UserList = ({ users, title }) => {
+const UserList = ({ users }) => {
   if (!users.length) {
     return <h3>No Users Yet</h3>;
   }
   return (
     <article>
-      <h3>{title}</h3>
+      <section>
+        <div className="heading">USERS</div>
+      </section>
       {users &&
         users.map(user => (
           <section key={user._id}>
-            <h4>{user.nickname}</h4>
-            <Link to={`/users/${user._id}`}>View User</Link>
+            <div className="subheading">{user.nickname}</div>
+            <Link to={`/users/${user._id}`}>
+              <div className="minor-heading">View User</div>
+            </Link>
           </section>
         ))}
     </article>

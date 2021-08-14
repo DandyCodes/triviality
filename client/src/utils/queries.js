@@ -14,6 +14,8 @@ export const GET_USER = gql`
     user(userId: $userId) {
       _id
       nickname
+      won
+      played
     }
   }
 `;
@@ -23,6 +25,8 @@ export const GET_ME = gql`
     me {
       _id
       nickname
+      won
+      played
     }
   }
 `;

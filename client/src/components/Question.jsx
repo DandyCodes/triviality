@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import ioClient from "../controllers/io-client";
 import { decodeQuestion, encodeToBase64 } from "../utils/helpers";
 import "./styles/Question.css";
@@ -52,9 +52,11 @@ const Question = () => {
     };
   });
   return question ? (
-    <article>
-      <section>{question.decodedQuestion}</section>
+    <Fragment>
       <section>
+        <div className="minor-heading">{question.decodedQuestion}</div>
+      </section>
+      <section className="options">
         {question.decodedOptions.map((decodedOption, index) =>
           revealed ? (
             <button
@@ -62,30 +64,39 @@ const Question = () => {
               disabled
               className={
                 encodeToBase64(decodedOption) === question.correct_answer
-                  ? "correct"
+                  ? "option correct"
                   : response === decodedOption
-                  ? "incorrect"
-                  : ""
+                  ? "option incorrect"
+                  : "option responded"
               }
             >
               {decodedOption}
             </button>
           ) : responded ? (
-            <button key={index} disabled>
-              {decodedOption}
-            </button>
+            response === decodedOption ? (
+              <button key={index} className="option selected">
+                {decodedOption}
+              </button>
+            ) : (
+              <button key={index} className="option responded">
+                {decodedOption}
+              </button>
+            )
           ) : (
             <button
               key={index}
               onClick={() => respondToQuestion(decodedOption)}
+              className="option"
             >
               {decodedOption}
             </button>
           )
         )}
       </section>
-      <section>{<span>Time Remaining: {timeRemaining}</span>}</section>
-    </article>
+      <section>
+        <div>{<span>Time Remaining: {timeRemaining}</span>}</div>
+      </section>
+    </Fragment>
   ) : null;
 };
 

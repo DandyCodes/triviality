@@ -9,7 +9,7 @@ const Footer = () => {
       {location.pathname !== "/" && (
         <button onClick={() => history.goBack()}>&larr; Go Back</button>
       )}
-      <h4>&copy; {new Date().getFullYear()} - Triviality</h4>
+      <div>&copy; {new Date().getFullYear()} - Triviality</div>
     </footer>
   );
 };

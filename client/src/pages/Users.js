@@ -7,13 +7,7 @@ const Users = () => {
   const { loading, data } = useQuery(GET_USERS);
   const users = data?.users || [];
   return (
-    <main>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <UserList users={users} title="All Users" />
-      )}
-    </main>
+    <main>{loading ? <div>Loading...</div> : <UserList users={users} />}</main>
   );
 };
 

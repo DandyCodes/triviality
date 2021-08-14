@@ -32,15 +32,31 @@ const Lobby = () => {
     <Redirect to="/" />
   ) : (
     <main>
-      <h1>Lobby: {room}</h1>
-      <Members
-        members={lobbyState.nicknames.map(nickname => ({ nickname }))}
-      ></Members>
-      {lobbyState.isCreator ? (
-        <Controls room={room}></Controls>
-      ) : (
-        <h4>Waiting...</h4>
-      )}
+      <article>
+        <section>
+          <div className="subheading">
+            LOBBY CODE: <code className="heading">{room}</code>
+          </div>
+        </section>
+        {lobbyState.isCreator ? (
+          <Controls room={room}></Controls>
+        ) : (
+          <section>
+            <div>Waiting...</div>
+          </section>
+        )}
+      </article>
+
+      <article>
+        <section>
+          <div className="minor-heading">PLAYERS</div>
+        </section>
+        <section>
+          <Members
+            members={lobbyState.nicknames.map(nickname => ({ nickname }))}
+          ></Members>
+        </section>
+      </article>
     </main>
   );
 };

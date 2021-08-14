@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     minlength: 2,
-    maxlength: 20,
+    maxlength: 16,
     validate: {
       validator: function (value) {
         return !profanityFilter.isProfane(value);
@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 6,
+  },
+  won: {
+    type: Number,
+    required: true,
+  },
+  played: {
+    type: Number,
+    required: true,
   },
 });
 

@@ -41,36 +41,32 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <div>
-          <Header />
-          <div>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/login">
-              <Login />
-            </Route>
-            <Route exact path="/signup">
-              <Signup />
-            </Route>
-            <Route exact path="/me">
-              <User />
-            </Route>
-            <Route exact path="/users/">
-              <Users />
-            </Route>
-            <Route exact path="/users/:userId">
-              <User />
-            </Route>
-            <Route path="/lobby/:room">
-              <Lobby />
-            </Route>
-            <Route path="/quiz/:room">
-              <Quiz />
-            </Route>
-          </div>
-          <Footer />
-        </div>
+        <Header />
+        <Route exact path="/">
+          <Home />
+        </Route>
+        <Route exact path="/login">
+          <Login />
+        </Route>
+        <Route exact path="/signup">
+          <Signup />
+        </Route>
+        <Route exact path="/me">
+          <User />
+        </Route>
+        <Route exact path="/users/">
+          <Users />
+        </Route>
+        <Route exact path="/users/:userId">
+          <User />
+        </Route>
+        <Route path="/lobby/:room">
+          <Lobby />
+        </Route>
+        <Route path="/quiz/:room">
+          <Quiz />
+        </Route>
+        <Footer></Footer>
       </Router>
     </ApolloProvider>
   );
