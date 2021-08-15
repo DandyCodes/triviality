@@ -1,7 +1,25 @@
-#delete {
-  color: var(--danger);
+#edit {
+  background-color: var(--warning);
 }
 
-#edit {
-  color: var(--warning);
+#delete {
+  background-color: var(--danger);
+}
+
+#edit:active {
+  background-color: var(--warning-active);
+}
+
+#delete:active {
+  background-color: var(--danger-active);
+}
+
+@media (hover: hover) {
+  #edit:hover {
+    background-color: var(--warning-hover);
+  }
+
+  #delete:hover {
+    background-color: var(--danger-hover);
+  }
 }

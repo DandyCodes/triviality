@@ -4,6 +4,7 @@ import clientAuth from "../utils/client-auth";
 import ioClient from "../controllers/io-client";
 import Members from "../components/Members";
 import Controls from "../components/Controls";
+import "./styles/Lobby.css";
 
 const Lobby = () => {
   const { room } = useParams();
@@ -35,7 +36,7 @@ const Lobby = () => {
       <article>
         <section>
           <div className="subheading">
-            LOBBY CODE: <code className="heading">{room}</code>
+            LOBBY CODE: <code id="room">{room}</code>
           </div>
         </section>
         {lobbyState.isCreator ? (

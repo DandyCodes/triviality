@@ -61,9 +61,7 @@ const Quiz = () => {
             ) : quizState.gameMode === "everyone" ? (
               <div className="game-mode-display">Everyone Can Answer</div>
             ) : null
-          ) : (
-            <div className="game-mode-display">Solo Play</div>
-          )}
+          ) : null}
         </section>
       </article>
     </main>

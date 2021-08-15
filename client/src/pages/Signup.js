@@ -35,7 +35,9 @@ const Signup = () => {
         {data ? (
           <section>
             <div>Success</div>
-            <Link to="/">back to home</Link>
+            <Link className="link" to="/">
+              back to home
+            </Link>
           </section>
         ) : (
           <section>

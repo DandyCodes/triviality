@@ -1,6 +1,6 @@
 header {
   box-sizing: border-box;
-  background-color: var(--contrast);
+  background-color: var(--dark);
   height: 4rem;
   display: flex;
   justify-content: space-between;
@@ -30,8 +30,4 @@ header .link {
   color: var(--info);
   font-size: 1.25rem;
   white-space: nowrap;
-}
-
-header .link:hover {
-  color: var(--link);
 }

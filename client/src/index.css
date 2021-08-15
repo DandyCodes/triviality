@@ -1,14 +1,22 @@
 :root {
-  --primary: hsl(210, 40%, 60%);
+  --primary: hsl(210, 40%, 45%);
+  --primary-hover: hsl(210, 40%, 50%);
+  --primary-active: hsl(210, 40%, 55%);
   --info: hsl(210, 40%, 80%);
   --link: hsl(150, 40%, 60%);
-  --success: hsl(90, 40%, 60%);
-  --warning: hsl(45, 55%, 65%);
-  --danger: hsl(0, 40%, 60%);
+  --success: hsl(90, 40%, 50%);
+  --success-hover: hsl(90, 40%, 55%);
+  --success-active: hsl(90, 40%, 60%);
+  --warning: hsl(45, 65%, 50%);
+  --warning-hover: hsl(45, 65%, 55%);
+  --warning-active: hsl(45, 65%, 60%);
+  --danger: hsl(0, 40%, 50%);
+  --danger-hover: hsl(0, 40%, 55%);
+  --danger-active: hsl(0, 40%, 60%);
   --dark: hsl(330, 1%, 12.5%);
   --light: hsl(45, 20%, 90%);
   --active-light: hsl(45, 25%, 80%);
-  --shadow: hsl(0, 0%, 35%);
+  --shadow: hsl(0, 0%, 20%);
   --contrast: hsl(330, 2%, 25%);
   --header-height: 4rem;
 }
@@ -19,8 +27,6 @@ code {
 }
 
 body {
-  color: var(--light);
-  background-color: var(--dark);
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -76,7 +82,8 @@ section {
 .minor-heading {
   font-size: 1.5rem;
   text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
-  color: var(--light);
+  color: var(--contrast);
+  text-decoration: none;
 }
 
 button {
@@ -87,23 +94,25 @@ button {
   font-size: 1rem;
   display: block;
   border-radius: 0.3rem;
-  color: var(--dark);
-  background-color: white;
+  color: white;
+  background-color: var(--primary);
   cursor: pointer;
   position: relative;
-  box-shadow: 0 -0.5rem 0 -0.35rem rgba(0, 0, 0, 0.3) inset;
+  box-shadow: 0 -1rem 0 -0.7rem rgba(0, 0, 0, 0.3) inset;
   margin-top: 0.2rem;
 }
 
 button:active {
   top: 0.1rem;
-  background-color: var(--active-light);
+  background-color: var(--primary-active);
 }
 
 .heading-button {
-  font-size: 3rem;
+  width: auto;
+  font-size: 2rem;
+  padding: 0.3rem 1rem;
   text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
-  color: var(--success);
+  color: white;
 }
 
 input,
@@ -120,13 +129,22 @@ input.number {
 
 .link-button {
   all: unset;
-  width: 100%;
-  max-width: 30rem;
   cursor: pointer;
+}
+
+.link {
+  color: inherit;
+  text-decoration: inherit;
 }
 
 @media (hover: hover) {
   button:hover {
-    background-color: var(--light);
+    background-color: var(--primary-hover);
+  }
+  .link:hover {
+    color: var(--link);
+  }
+  .link .minor-heading:hover {
+    color: var(--link);
   }
 }

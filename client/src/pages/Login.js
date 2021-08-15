@@ -34,7 +34,7 @@ const Login = () => {
         {data ? (
           <section>
             <div className="heading">Success</div>
-            <Link to="/">
+            <Link className="link" to="/">
               <div className="minor-heading">back to home</div>
             </Link>
           </section>

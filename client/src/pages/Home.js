@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import clientAuth from "../utils/client-auth";
 import ioClient from "../controllers/io-client";
@@ -34,32 +34,27 @@ const Home = () => {
           <div className="heading">WELCOME</div>
         </section>
         {clientAuth.isLoggedIn() ? (
-          <Fragment>
-            <section>
-              <input
-                onChange={handleChange}
-                name="lobby"
-                type="text"
-                placeholder="Enter lobby code..."
-                onKeyDown={e => e.key === "Enter" && onJoinLobbyClicked()}
-              ></input>
-              <button
-                className="heading-button"
-                onClick={onJoinLobbyClicked}
-                type="submit"
-              >
-                JOIN
-              </button>
-            </section>
-            <section>
-              <div className="subheading">OR</div>
-            </section>
-            <section>
-              <button className="heading-button" onClick={ioClient.createLobby}>
-                CREATE
-              </button>
-            </section>
-          </Fragment>
+          <section>
+            <input
+              onChange={handleChange}
+              name="lobby"
+              type="text"
+              placeholder="Enter lobby code"
+              onKeyDown={e => e.key === "Enter" && onJoinLobbyClicked()}
+              id="lobby-input"
+            ></input>
+            <button
+              className="heading-button"
+              onClick={onJoinLobbyClicked}
+              type="submit"
+            >
+              JOIN
+            </button>
+            <div className="subheading">OR</div>
+            <button className="heading-button" onClick={ioClient.createLobby}>
+              CREATE
+            </button>
+          </section>
         ) : (
           <section>
             <Link className="link-button" to="/login">
@@ -73,9 +68,11 @@ const Home = () => {
         )}
       </article>
       <article>
-        <Link to={`/users/`}>
-          <div className="minor-heading">View users.</div>
-        </Link>
+        <section>
+          <Link className="link" to={`/users/`}>
+            <div className="minor-heading">View users.</div>
+          </Link>
+        </section>
       </article>
     </main>
   );
