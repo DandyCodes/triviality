@@ -69,19 +69,18 @@ section {
 
 .heading {
   font-size: 3.5rem;
-  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  text-shadow: 0.03rem 0.03em 0.07rem var(--shadow);
   color: var(--primary);
 }
 
 .subheading {
   font-size: 2rem;
-  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  text-shadow: 0.03rem 0.03em 0.07rem var(--shadow);
   color: var(--warning);
 }
 
 .minor-heading {
   font-size: 1.5rem;
-  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
   color: var(--contrast);
   text-decoration: none;
 }
@@ -111,7 +110,7 @@ button:active {
   width: auto;
   font-size: 2rem;
   padding: 0.3rem 1rem;
-  text-shadow: 0.04rem 0.04em 0.1rem var(--shadow);
+  text-shadow: 0.03rem 0.03em 0.07rem var(--shadow);
   color: white;
 }
 

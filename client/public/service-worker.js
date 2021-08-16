@@ -6,9 +6,8 @@ const STATIC_FILEPATHS = [
   "/logo512.png",
   "/manifest.json",
   "/robots.txt",
-  "/service-worker.js",
 ];
-const STATIC_CACHE_KEY = "static-cache-v2";
+const STATIC_CACHE_KEY = "static-cache-v3";
 
 self.oninstall = event => event.waitUntil(install());
 self.onactivate = event => event.waitUntil(activate());
